@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "id": "sacrvm-newskit",
+  "commands": [
+    {
+      "name": "Serve",
+      "type": "Shell",
+      "icon": "🚀",
+      "command": "cmd",
+      "args": ["/c", "npx", "serve", ".", "-l", "3001"],
+      "window": "reuse:serve",
+      "longRunning": true
+    },
+    {
+      "name": "GitHub",
+      "type": "Url",
+      "icon": "🐙",
+      "url": "https://github.com/SACRVM/sacrvm-newskit"
+    },
+    {
+      "name": "Plan",
+      "type": "Url",
+      "icon": "🗺️",
+      "url": "https://claude.ai/code/artifact/44c9a845-c11a-40a9-ae5c-2fe7cc6495dc"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+    "name": "sacrvm-newskit",
+    "version": "0.0.0",
+    "description": "Zero-dependency editorial kit for publishing long-form, source-backed articles - a sister of SACRVM APPKIT. Appkit's look with condensed news headlines, article primitives, and sources/provenance as first-class citizens. No build step, no node_modules - vendor the newskit/ folder as plain files. This package exists only as a courtesy mirror of those files.",
+    "license": "MIT",
+    "author": "SACRVM",
+    "homepage": "https://github.com/SACRVM/sacrvm-newskit",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SACRVM/sacrvm-newskit.git"
+    },
+    "files": [
+        "newskit"
+    ],
+    "keywords": [
+        "web-components",
+        "custom-elements",
+        "editorial",
+        "articles",
+        "publishing",
+        "long-form",
+        "design-tokens",
+        "zero-dependency",
+        "no-build",
+        "vanilla-js"
+    ]
+}
