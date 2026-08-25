@@ -1,0 +1,253 @@
+/* ==========================================================================
+   SACRVM NEWSKIT — the reading layer
+   The editorial layer on top of SACRVM APPKIT. Requires the vendored kit's
+   ui.css to be loaded FIRST — newskit consumes appkit's seeds and derived
+   tokens (--bg, --fg, --text, --text-muted, --border, --tile, --accent-text,
+   radii …) without fallbacks, so a retheme of appkit rethemes newskit and a
+   missing ui.css fails loudly, exactly like a missing token would in the kit.
+
+   What this file adds (and nothing more):
+   - Oswald, the ONE face newskit brings: condensed, UPPERCASE display
+     headlines — the news signature. Inter (reading) and Outfit (labels)
+     stay appkit's.
+   - The reading tokens: --display-font, --measure, --text-read and the two
+     soft tint planes (--accent-soft / --warm-soft) the article surfaces use.
+   - The reading container (sac-article) and the article type scale: the
+     ~40rem prose measure, rhythm, and prose element treatment.
+
+   Extracted from the owner-approved design template
+   (reference/design-template.html). The template is a standalone page and
+   carries its own token approximations; THIS file is the binding of that
+   look to appkit's real engine — where the template re-solved a colour that
+   appkit's flag system (--text-solve + *-pct) already solves per scheme,
+   the appkit token wins, so light / dark / auto and per-app accents keep
+   working without a parallel theme model here.
+
+   Hard rules from the design review (Fable + Grok), honoured here:
+   - Body copy reads on --text-read (softened off the pure seed to kill
+     dark-mode halation; still AA). Muted is for standfirst, notes, origins.
+   - Prose measure ≤ ~40rem (~68ch at this size).
+   - Micro-type floor 0.7rem; every text tier ≥ AA in both schemes.
+   - Never a thick (≥2px) COLORED border on a rounded surface; the one thick
+     rule in the system (the masthead underline, phase 2) is neutral + flat.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Oswald — self-hosted (OFL 1.1), latin + latin-ext subsets, variable
+   500–600 (the only two weights the kit uses). Same subset ranges as the
+   kit's Inter/Outfit, so fallback behaviour is identical across the family.
+   -------------------------------------------------------------------------- */
+@font-face {
+    font-family: 'Oswald';
+    font-style: normal;
+    font-weight: 500 600;
+    font-display: swap;
+    src: url('fonts/oswald-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Oswald';
+    font-style: normal;
+    font-weight: 500 600;
+    font-display: swap;
+    src: url('fonts/oswald-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* --------------------------------------------------------------------------
+   2. Reset completion — appkit's base reset is `*` alone, which does not
+   match pseudo-elements; a bordered ::before circle or ::after line then
+   mis-centres (learned building the chapter rail). Additive, not a fork.
+   -------------------------------------------------------------------------- */
+*::before, *::after { box-sizing: border-box; }
+
+/* --------------------------------------------------------------------------
+   3. Reading tokens.
+   Direction-safe derivations (they re-derive from the flipped seeds) live on
+   :root alone, like appkit's --panel. Accent-DEPENDENT tokens are declared on
+   the same per-app accent scopes appkit uses, so an article inside an app
+   that carries its own --accent tints correctly.
+   -------------------------------------------------------------------------- */
+:root {
+    /* The display face — condensed, uppercase, 500/600 only. One token so a
+       publication can swap the headline voice in one line. */
+    --display-font: 'Oswald', 'Arial Narrow', sans-serif;
+
+    /* Prose measure — ~68ch at the reading size. Text blocks cap to this;
+       the article container is wider so evidence cards and figures breathe. */
+    --measure: 40rem;
+
+    /* Long-form reading colour: softened off the pure seed to kill dark-mode
+       halation; still AA in both schemes (it re-derives from the flipped
+       seeds). --text stays for headings and strong. */
+    --text-read: color-mix(in srgb, var(--fg) 88%, var(--bg));
+
+    /* Standfirst sits between body and muted — a quiet step down that is
+       still comfortably AA at its 1.25rem size. */
+    --text-standfirst: color-mix(in srgb, var(--fg) 84%, var(--bg));
+}
+:root,
+.sac-app,
+.sac-app-view,
+sac-window {
+    /* Soft tint planes — quieter than appkit's --accent-tint (16%): the
+       analysis highlight, callouts and cite chips sit on these. Warm is the
+       method/disclosure trust-anchor signature. */
+    --accent-soft: color-mix(in srgb, var(--accent) 9%, transparent);
+    --warm-soft:   color-mix(in srgb, var(--accent-warm) 10%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   4. The reading container — sac-article (custom element, registered in
+   phase 2) with the .sac-article class fallback. Sets the reading voice for
+   its whole subtree; pages outside it keep appkit's UI type untouched.
+   -------------------------------------------------------------------------- */
+sac-article, .sac-article {
+    display: block;
+    max-width: 52rem;
+    margin-inline: auto;
+    padding: 0 1.5rem 4rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1.0625rem;       /* 17px — the long-form reading size */
+    line-height: 1.65;
+    color: var(--text-read);
+}
+@media (max-width: 38rem) {
+    sac-article, .sac-article { font-size: 1rem; }
+}
+
+/* --------------------------------------------------------------------------
+   5. The article type scale — the condensed UPPERCASE display treatment is
+   the news signature; everything else stays appkit.
+   h1 display · h2 section · h3 entry · h4 subhead.
+   -------------------------------------------------------------------------- */
+sac-article h1, .sac-article h1 {
+    font-family: var(--display-font);
+    font-weight: 600;
+    font-size: clamp(3rem, 12vw, 6.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    color: var(--text);
+    margin: 0 0 1.1rem;
+}
+sac-article h2, .sac-article h2 {
+    font-family: var(--display-font);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 4.4vw, 2.35rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    color: var(--text);
+    margin: 2.6rem 0 0.6rem;
+}
+sac-article h3, .sac-article h3 {
+    font-family: var(--display-font);
+    font-weight: 500;
+    font-size: 1.4rem;
+    line-height: 1.12;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    color: var(--text);
+    margin: 1.9rem 0 0.45rem;
+}
+sac-article h4, .sac-article h4 {
+    font-family: var(--display-font);
+    font-weight: 500;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    color: var(--text);
+    margin: 2rem 0 0.6rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. Prose rhythm — element treatment inside the reading container.
+   -------------------------------------------------------------------------- */
+sac-article p, .sac-article p {
+    margin: 0 0 1.05rem;
+    max-width: var(--measure);
+}
+sac-article strong, .sac-article strong { color: var(--text); font-weight: 600; }
+
+/* ui.css strips link underlines for UI chrome; long-form prose needs them
+   back — an unmarked link in running text is invisible to a colour-blind
+   reader. Accent-as-text ink, hairline underline, accent on hover. */
+sac-article a, .sac-article a {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+sac-article a:hover, .sac-article a:hover { text-decoration-color: var(--accent); }
+sac-article a:focus-visible, .sac-article a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: var(--radius-s);
+}
+
+sac-article code, .sac-article code {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    background: color-mix(in srgb, var(--fg) 6%, transparent);
+    padding: 0.08em 0.38em;
+    border-radius: var(--radius-s);
+    color: var(--text);
+}
+
+sac-article ul, .sac-article ul,
+sac-article ol, .sac-article ol {
+    margin: 0.2rem 0 1.05rem;
+    padding-left: 1.35rem;
+    max-width: var(--measure);
+}
+sac-article li, .sac-article li { margin: 0 0 0.35rem; }
+sac-article li::marker, .sac-article li::marker { color: var(--text-muted); }
+
+/* Plain blockquote — quiet, hairline-led. The display-weight emphasis line
+   is sac-pullquote (phase 2), not this. */
+sac-article blockquote, .sac-article blockquote {
+    margin: 1.4rem 0;
+    padding: 0.2rem 0 0.2rem 1.1rem;
+    border-left: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    max-width: var(--measure);
+}
+sac-article blockquote p, .sac-article blockquote p { color: inherit; }
+
+sac-article hr, .sac-article hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.6rem 0;
+    max-width: var(--measure);
+}
+
+sac-article img, .sac-article img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-l);
+}
+
+/* --------------------------------------------------------------------------
+   7. Reading-layer type utilities — the two masthead type tiers that are
+   pure typography (the masthead BLOCK — 2px neutral rule, meta-row — is
+   sac-masthead, phase 2). Prefixed like appkit's .sac-caption.
+   -------------------------------------------------------------------------- */
+.sac-kicker {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin: 0 0 1.1rem;
+}
+.sac-standfirst {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: var(--text-standfirst);
+    max-width: var(--measure);
+    margin: 0 0 1.5rem;
+}

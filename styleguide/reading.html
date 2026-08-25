@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEWSKIT — Reading layer</title>
+    <link rel="stylesheet" href="../kit/css/ui.css">
+    <link rel="stylesheet" href="../newskit/newskit.css">
+    <style>
+        /* Page chrome only — everything typographic on this page comes from
+           newskit.css; if something here needs more than positioning, it
+           belongs in the kit instead. */
+        .theme-corner { position: fixed; top: 1rem; right: 1rem; z-index: 10; }
+        .specimen { padding-top: 4rem; }
+    </style>
+    <script defer src="../kit/js/lib/globals.js"></script>
+    <script defer src="../kit/js/components/sac-theme-toggle.js"></script>
+</head>
+<body>
+    <div class="theme-corner"><sac-theme-toggle></sac-theme-toggle></div>
+
+    <article class="sac-article specimen">
+
+        <p class="sac-kicker">Newskit styleguide · Phase 1 · Type specimen</p>
+        <h1>The reading layer</h1>
+        <p class="sac-standfirst">Appkit's look, specialised for reading: the ~40rem
+        prose measure, the article type scale, and one new face — Oswald, condensed
+        and uppercase — carrying the news signature. Everything else on this page is
+        appkit's own tokens, in light, dark and auto.</p>
+
+        <p>This page is the proof for phase 1. The body you are reading is
+        <strong>Inter at 17px</strong> on <code>--text-read</code> — softened a step
+        off the pure foreground seed so long passages don't halate on the dark
+        ground, while staying comfortably AA in both schemes. Lines cap at the
+        <code>--measure</code> of 40rem, which lands around 68 characters: long
+        enough to carry an argument, short enough that the eye finds the next line
+        without effort. Flip the theme toggle in the corner — every colour on this
+        page re-derives from appkit's seeds, so the whole specimen re-themes at
+        once, <em>including</em> the accent-as-text tiers like
+        <a href="#top">this link</a> and the kicker above the headline.</p>
+
+        <p>The headline above is the one deliberate addition newskit makes to
+        appkit's voice: <strong>Oswald 600</strong>, condensed, uppercase, tight
+        line-height. It is the signature of the reference treatment — the news
+        feeling comes from structure and this display face, never from a separate
+        palette or a warm-paper skin.</p>
+
+        <h2>The section tier</h2>
+        <p>An <code>h2</code> steps the same display voice down to section scale.
+        In a finished article this heading usually arrives inside a
+        <code>sac-section-head</code> with its accent marker — that block is
+        phase 2; the bare scale must already hold up on its own, because
+        hand-authored articles are plain HTML first.</p>
+
+        <h3>The entry tier</h3>
+        <p>An <code>h3</code> is the title weight of a record card — Oswald 500,
+        the lighter of the two weights the kit ships. Only these two weights
+        exist; the face is subset to latin and latin-ext exactly like the kit's
+        Inter and Outfit, self-hosted, no CDN.</p>
+
+        <h4>The subhead tier</h4>
+        <p>And an <code>h4</code> marks a run of prose inside a section. Below the
+        headline tiers, ordinary prose furniture keeps its manners:</p>
+
+        <ul>
+            <li>Unordered lists sit inside the measure, markers on
+                <code>--text-muted</code>.</li>
+            <li>Emphasis is <em>italic</em>; importance is <strong>a weight and
+                ink step</strong>, not a colour.</li>
+            <li>Inline <code>code</code> takes the kit's quiet 6% wash and the
+                small radius.</li>
+        </ul>
+
+        <ol>
+            <li>Ordered lists share the same rhythm.</li>
+            <li>Nothing on this page falls below the 0.7rem micro-type
+                floor.</li>
+        </ol>
+
+        <blockquote>
+            <p>A plain blockquote stays quiet — hairline-led, muted ink. The
+            display-weight emphasis line is a different animal
+            (<code>sac-pullquote</code>, phase 2).</p>
+        </blockquote>
+
+        <hr>
+
+        <p>What this page deliberately does <strong>not</strong> show: record
+        cards, source chips, cite markers, the provenance strip, the chapter
+        rail. Those are the core primitives and the trust layer — phase 2 — and
+        they will sit on the tokens proven here: <code>--accent-soft</code> and
+        <code>--warm-soft</code> for the tint planes, <code>--display-font</code>
+        for every headline, <code>--measure</code> for every line of prose.</p>
+
+    </article>
+</body>
+</html>
