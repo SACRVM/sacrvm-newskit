@@ -11,7 +11,9 @@ citizens**, because that is what a researched article stands on.
 The full project plan — vision, the locked decisions, the component inventory, the build
 order — is the design-review-hardened plan artifact:
 https://claude.ai/code/artifact/44c9a845-c11a-40a9-ae5c-2fe7cc6495dc — and `ROADMAP.md` in
-this repo. Do not re-derive the design; it is decided below.
+this repo. The **owner-approved visual design template** (that page in the target style) is
+checked in at `reference/design-template.html` — the source of truth for the look; Phase 1
+extracts `newskit.css` from it. Do not re-derive the design; it is decided below.
 
 ## Relationship to appkit — two kits, one look
 

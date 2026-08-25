@@ -1,0 +1,554 @@
+<title>Newskit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&family=Oswald:wght@500;600&display=swap">
+<style>
+/* Appkit tokens, real values — dark-first, light on opt-in / prefers-light. */
+:root{
+  color-scheme:dark;
+  --bg:#0b0f1a; --fg:#f8fafc; --surface:#1e293b;
+  --accent:#3b82f6; --accent-warm:#f97316;
+  --radius-s:2px; --radius-m:4px; --radius-l:6px;
+
+  --tile:color-mix(in srgb,var(--surface) 70%,transparent);
+  --text:var(--fg);
+  /* long-form reading colour: softened off the pure seed to kill dark-mode
+     halation; still AA. Muted/dim are for standfirst, notes, origins only. */
+  --text-read:color-mix(in srgb,var(--fg) 88%,var(--bg));
+  --text-muted:color-mix(in srgb,var(--fg) 66%,var(--bg));
+  --text-dim:color-mix(in srgb,var(--fg) 55%,var(--bg));
+  --border:color-mix(in srgb,var(--fg) 8%,transparent);
+  --border-strong:color-mix(in srgb,var(--fg) 16%,transparent);
+  --accent-tint:color-mix(in srgb,var(--accent) 16%,transparent);
+  --accent-soft:color-mix(in srgb,var(--accent) 9%,transparent);
+  --warm-soft:color-mix(in srgb,var(--accent-warm) 10%,transparent);
+  --accent-text:color-mix(in oklab,var(--accent) 90%,var(--fg));
+  --warm-text:color-mix(in oklab,var(--accent-warm) 100%,var(--fg));
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    color-scheme:light;
+    --bg:#eef2f7; --fg:#0f172a; --surface:#ffffff;
+    --text-muted:color-mix(in srgb,var(--fg) 72%,var(--bg));
+    --text-dim:color-mix(in srgb,var(--fg) 60%,var(--bg));
+    --accent-text:color-mix(in oklab,var(--accent) 82%,#000);
+    --warm-text:color-mix(in oklab,var(--accent-warm) 72%,#000);
+  }
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef2f7; --fg:#0f172a; --surface:#ffffff;
+  --text-muted:color-mix(in srgb,var(--fg) 72%,var(--bg));
+  --text-dim:color-mix(in srgb,var(--fg) 60%,var(--bg));
+  --accent-text:color-mix(in oklab,var(--accent) 82%,#000);
+  --warm-text:color-mix(in oklab,var(--accent-warm) 72%,#000);
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0b0f1a; --fg:#f8fafc; --surface:#1e293b;
+  --text-muted:color-mix(in srgb,var(--fg) 66%,var(--bg));
+  --text-dim:color-mix(in srgb,var(--fg) 55%,var(--bg));
+  --accent-text:color-mix(in oklab,var(--accent) 90%,var(--fg));
+  --warm-text:color-mix(in oklab,var(--accent-warm) 100%,var(--fg));
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text-read);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-size:17px;line-height:1.65;
+}
+.shell{display:grid;grid-template-columns:14rem minmax(0,1fr);max-width:74rem;margin:0 auto}
+.wrap{max-width:52rem;padding:0 2rem 6rem 2.5rem;min-width:0}
+/* persistent left chapter rail — always visible, tracks the current section */
+/* padding-top aligns the rail's top with the masthead headline when at the very
+   top of the page (H1 sits below the kicker); it stays as breathing room once stuck. */
+.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:6.2rem 1rem 2rem 1.6rem;border-right:1px solid var(--border)}
+.toc-brand{font-family:'Oswald','Arial Narrow',sans-serif;font-weight:600;text-transform:uppercase;font-size:1.4rem;line-height:1;color:var(--text);margin:0 0 .2rem;letter-spacing:.01em}
+.toc-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);margin:0 0 1.6rem}
+/* --rail = the shared centre line; rail track and every bubble derive from it,
+   so they line up exactly (was the misalignment). */
+.toc ol{list-style:none;margin:0;padding:0 0 0 1.5rem;position:relative;--rail:.5rem}
+.toc li{position:relative;margin:0}
+.toc a{position:relative;display:flex;gap:.6rem;align-items:baseline;padding:.42rem .5rem;border-radius:var(--radius-m);text-decoration:none;color:var(--text-muted);font-family:'Outfit',sans-serif;font-weight:600;font-size:.92rem;line-height:1.35;transition:color .15s}
+/* Bubble AND connecting line are both pseudos of the SAME anchor with the SAME
+   left origin, so their centres are identical by construction — they cannot
+   drift. The line spans from this bubble's centre down to the next one. */
+.toc a::after{content:"";position:absolute;left:calc(var(--rail) - 1.5rem - 1px);top:50%;height:100%;width:2px;background:var(--border);z-index:0}
+.toc li:last-child a::after{display:none}
+.toc a::before{content:"";position:absolute;left:calc(var(--rail) - 1.5rem - .4rem);top:50%;transform:translateY(-50%);width:.8rem;height:.8rem;border-radius:50%;background:var(--bg);border:2px solid var(--border-strong);z-index:1;transition:background .15s,border-color .15s,box-shadow .15s}
+.toc a .n{font-size:.7rem;font-weight:700;color:var(--text-dim);font-variant-numeric:tabular-nums;min-width:1.1rem;letter-spacing:.03em;transition:color .15s}
+.toc a:hover{color:var(--text)}
+.toc a:hover::before{border-color:var(--text-muted)}
+.toc a.done{color:var(--text-muted)}
+.toc a.done::before{background:color-mix(in srgb,var(--accent) 55%,var(--bg));border-color:color-mix(in srgb,var(--accent) 55%,var(--bg))}
+.toc a.active{color:var(--accent-text)}
+.toc a.active::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.toc a.active .n{color:var(--accent-text)}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.section,.essay{scroll-margin-top:1.5rem}
+@media(max-width:60rem){.shell{grid-template-columns:1fr}.toc{display:none}.wrap{padding:0 1.5rem 6rem;margin:0 auto}}
+/* prose measure — capped well under the shell so lines stay ~68ch */
+p{margin:0 0 1.05rem;color:var(--text-read);max-width:40rem}
+strong{color:var(--text);font-weight:600}
+em{font-style:italic}
+a{color:var(--accent-text);text-underline-offset:2px;text-decoration-thickness:1px}
+a:hover{text-decoration-color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.85em;background:color-mix(in srgb,var(--fg) 6%,transparent);padding:.08em .38em;border-radius:var(--radius-s);color:var(--text)}
+
+/* eyebrow / caption — appkit's caption shape */
+.kicker{
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent-text);
+  margin:0 0 1.1rem;
+}
+
+/* masthead — a 2px NEUTRAL flat rule (rule-compliant: not colored, not a
+   rounded surface) is the strongest single "news" signal on the page. */
+.masthead{padding:4rem 0 2rem;border-bottom:2px solid color-mix(in srgb,var(--fg) 78%,transparent)}
+h1{
+  font-family:'Oswald','Arial Narrow',sans-serif;font-weight:600;
+  font-size:clamp(3rem,12vw,6.5rem);line-height:.9;letter-spacing:-.01em;
+  text-transform:uppercase;margin:0 0 1.1rem;text-wrap:balance;color:var(--text);
+}
+.standfirst{font-size:1.25rem;line-height:1.5;color:color-mix(in srgb,var(--fg) 84%,var(--bg));max-width:40rem;margin:0 0 1.5rem}
+.meta-row{
+  display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:.72rem;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);
+}
+.meta-row span{display:inline-flex;align-items:center;gap:.4rem}
+.meta-row span::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+
+/* section heads */
+.section{padding:3rem 0 .5rem}
+.section-head{display:grid;grid-template-columns:5rem 1fr;gap:1.4rem;align-items:start;margin-bottom:1.6rem}
+.marker{
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.7rem;
+  letter-spacing:.1em;line-height:1.45;text-transform:uppercase;
+  color:var(--accent-text);padding-top:.55rem;border-top:1px solid var(--accent);
+}
+.section h2{
+  font-family:'Oswald','Arial Narrow',sans-serif;font-weight:600;
+  font-size:clamp(1.6rem,4.4vw,2.35rem);line-height:1.05;text-transform:uppercase;
+  margin:0 0 .4rem;color:var(--text);letter-spacing:0;
+}
+.section-note{font-size:1rem;color:var(--text-muted);margin:0;max-width:36rem}
+.section>p{max-width:40rem}
+
+/* record cards — appkit surface: rounded tile, hairline, NO thick colored
+   border (accent lives in the eyebrow + a soft tint block instead). */
+.record{background:var(--tile);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.4rem 1.5rem 1.2rem;margin:1.1rem 0}
+.record h3{
+  font-family:'Oswald','Arial Narrow',sans-serif;font-weight:500;font-size:1.4rem;
+  line-height:1.12;text-transform:uppercase;letter-spacing:.005em;margin:0 0 .25rem;color:var(--text);
+}
+.origin,.record .origin{
+  font-family:'Outfit',sans-serif;font-weight:500;font-size:.68rem;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin:0 0 .9rem;
+}
+.record p{font-size:.97rem;margin:0 0 .8rem;max-width:40rem}
+.record p:last-child{margin-bottom:0}
+.label{
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.7rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text);
+  display:block;margin-bottom:.2rem;
+}
+.record.warm .label,.record.warm .origin{color:var(--warm-text)}
+/* the "analysis" highlight — subtle accent tint, no border stripe */
+.highlight{background:var(--accent-soft);border-radius:var(--radius-m);padding:.9rem 1.05rem;margin-top:.9rem}
+.highlight p{font-size:.94rem}
+
+/* inline citation marker → the source list. Cheapest large trust win. */
+.cite{
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.62em;
+  vertical-align:.4em;line-height:0;color:var(--accent-text);
+  background:var(--accent-soft);border-radius:var(--radius-s);
+  padding:.15em .32em;margin-left:.12em;text-decoration:none;
+}
+.cite:hover{background:var(--accent-tint)}
+
+/* sources — the credibility spine, as scannable chips (not a dim link run) */
+.srcs{margin:.95rem 0 0;padding:.8rem 0 0;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;gap:.4rem}
+.srcs-label{font-family:'Outfit',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-right:.25rem}
+.srcs a{
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:.72rem;
+  background:var(--tile);border:1px solid var(--border);border-radius:var(--radius-s);
+  padding:.22rem .55rem;color:var(--text-muted);text-decoration:none;
+}
+.srcs a:hover{border-color:var(--border-strong);color:var(--accent-text)}
+
+/* provenance strip — under the title of a researched piece */
+.provenance{
+  display:flex;flex-wrap:wrap;gap:.4rem .95rem;align-items:center;margin:1.1rem 0;
+  padding:.65rem .9rem;background:var(--tile);border:1px solid var(--border);border-radius:var(--radius-m);
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:.72rem;letter-spacing:.03em;color:var(--text-muted);
+}
+.provenance b{color:var(--text);font-weight:700}
+
+/* inventory table */
+.scroll{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;margin:1.1rem 0;font-size:.92rem}
+.tbl th,.tbl td{text-align:left;vertical-align:top;padding:.6rem .8rem;border-bottom:1px solid var(--border)}
+.tbl th{
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.7rem;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);
+  border-bottom:1px solid var(--border-strong);
+}
+.tbl td{color:var(--text-read)}
+.tbl td code{white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+
+/* callout — generic aside; .method carries the warm trust-anchor signature */
+.callout{margin:1.3rem 0;padding:1.1rem 1.3rem;background:var(--accent-soft);border-radius:var(--radius-l)}
+.callout p{margin:0 0 .55rem;color:var(--text-read);font-size:.95rem;max-width:38rem}
+.callout p:last-child{margin:0}
+.callout .label{color:var(--accent-text)}
+.callout.method{background:var(--warm-soft)}
+.callout.method .label{color:var(--warm-text)}
+
+/* card grid */
+.grid{display:grid;gap:.7rem;margin:1.5rem 0}
+@media(min-width:44rem){.grid.two{grid-template-columns:1fr 1fr}}
+.cell{background:var(--tile);border:1px solid var(--border);border-radius:var(--radius-l);padding:1.1rem 1.2rem}
+.cell h4{
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.74rem;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text);margin:0 0 .45rem;
+}
+.cell p{font-size:.92rem;margin:0;color:var(--text-read);max-width:none}
+
+/* phase timeline */
+ol.phases{counter-reset:ph;list-style:none;padding:0;margin:1.4rem 0}
+ol.phases li{position:relative;padding:0 0 1.3rem 3.2rem;margin-left:.9rem}
+/* line + numbered circle are both pseudos of the SAME li, centred on the same
+   x, so they cannot drift; the circle is OPAQUE so the line never shows through. */
+ol.phases li::after{content:"";position:absolute;left:-1px;top:.85rem;height:100%;width:2px;background:var(--border);z-index:0}
+ol.phases li:last-child::after{display:none}
+ol.phases li::before{
+  counter-increment:ph;content:counter(ph,decimal-leading-zero);
+  position:absolute;left:-.85rem;top:0;width:1.7rem;height:1.7rem;z-index:1;
+  background:color-mix(in srgb,var(--surface) 70%,var(--bg));border:1px solid var(--border-strong);border-radius:50%;
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:.68rem;color:var(--accent-text);
+  display:flex;align-items:center;justify-content:center;
+}
+ol.phases h4{font-family:'Oswald','Arial Narrow',sans-serif;font-weight:500;font-size:1.18rem;text-transform:uppercase;letter-spacing:.005em;margin:0 0 .25rem;color:var(--text)}
+ol.phases p{font-size:.93rem;margin:0;color:var(--text-read);max-width:36rem}
+
+.pull{
+  font-family:'Oswald','Arial Narrow',sans-serif;font-weight:500;
+  font-size:clamp(1.5rem,3.8vw,2.1rem);line-height:1.15;text-transform:uppercase;
+  color:var(--accent-text);margin:2rem 0 1.1rem;max-width:34rem;letter-spacing:0;
+}
+.essay{margin-top:3.2rem;padding-top:2rem;border-top:2px solid color-mix(in srgb,var(--fg) 40%,transparent)}
+.subhead{font-family:'Oswald','Arial Narrow',sans-serif;font-weight:500;text-transform:uppercase;font-size:1.2rem;letter-spacing:.005em;margin:2rem 0 .6rem;color:var(--text)}
+
+.skeleton{
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.78rem;line-height:1.65;
+  color:var(--text);white-space:pre;margin:0;max-width:none;
+}
+
+footer{
+  margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--border);
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:.72rem;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);line-height:1.9;
+}
+@media(max-width:38rem){.section-head{grid-template-columns:1fr;gap:.5rem}body{font-size:16px}}
+</style>
+
+<div class="shell">
+
+<aside class="toc" aria-label="Chapters">
+  <p class="toc-brand">Newskit</p>
+  <p class="toc-title">Contents</p>
+  <ol>
+    <li><a href="#part-01"><span class="n">01</span> The idea</a></li>
+    <li><a href="#part-02"><span class="n">02</span> The decisions</a></li>
+    <li><a href="#part-03"><span class="n">03</span> The kit</a></li>
+    <li><a href="#part-04"><span class="n">04</span> Publishing</a></li>
+    <li><a href="#part-05"><span class="n">05</span> Writing one</a></li>
+    <li><a href="#part-06"><span class="n">06</span> Shipping</a></li>
+    <li><a href="#part-07"><span class="n">07</span> Build order</a></li>
+    <li><a href="#not"><span class="n">·</span> What it's not</a></li>
+  </ol>
+</aside>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">Project plan · Sister of SACRVM APPKIT · Draft</p>
+  <h1>Newskit</h1>
+  <p class="standfirst">A sister kit to SACRVM APPKIT for publishing long-form, source-backed articles. It wears appkit's own look — the news feeling comes from structure and hierarchy, not a separate skin.</p>
+  <div class="meta-row">
+    <span>Drafted 24 Aug 2026</span>
+    <span>Reviewed by Fable + Grok</span>
+    <span>Zero build</span>
+    <span>Appkit-native look</span>
+  </div>
+</header>
+
+<!-- ============ VISION ============ -->
+<section class="section">
+  <div class="section-head">
+    <div class="marker">Part 01<br>The idea</div>
+    <div>
+      <h2>Appkit, extended for reading</h2>
+      <p class="section-note">Newskit does not invent a new visual language. It is appkit — same tokens, same fonts, same surfaces — specialised for the one job appkit isn't shaped for: a long article, read top to bottom.</p>
+    </div>
+  </div>
+  <p>SACRVM APPKIT is built for <em>operating</em> software: a workspace shell, controls, floating windows. An article is a different shape of page — one column, minutes of reading, a clear top-to-bottom hierarchy. Newskit keeps appkit's identity and adds the layer that shape needs.</p>
+  <p><strong>Inherited from appkit, unchanged — the machinery AND the look:</strong> the seed→derived theming engine (<code>--bg</code>, <code>--surface</code>, <code>--accent</code>, light / dark / auto), Inter (reading) + Outfit (labels), rounded surfaces and hairline borders, the <code>sac.*</code> namespace and component pattern, and the whole delivery model — autark vendoring, GitHub-Action ZIP, versioned <code>VERSION</code>.</p>
+  <p><strong>Added by newskit:</strong> a reading-optimised layout with a persistent left chapter rail (a ToC that tracks the current section — this page has one), one condensed display face for headlines (Oswald — the reference's signature, the part you singled out), a small set of article primitives, and — the real point — <em>sources and provenance as first-class citizens</em>, because that is what a researched article stands on. The reference article supplies the <em>structure and the headline treatment</em>: masthead, layered sections, entry cards, a sources block per claim, pull-quotes, a method note. Rendered in appkit's palette, that reads as news without becoming a magazine pastiche.</p>
+  <div class="callout">
+    <p><span class="label">Relationship</span>A separate repo, <code>sacrvm-newskit</code>, that vendors appkit exactly like any consumer app (the release ZIP's <code>kit/</code> dropped in verbatim, linked locally). Newskit's reading layer sits beside it and consumes its tokens directly — so the two never diverge in look, and appkit's core stays lean (the parked "md-editor add-on" precedent: specialisation lives outside core).</p>
+  </div>
+</section>
+
+<!-- ============ DECISIONS ============ -->
+<section class="section">
+  <div class="section-head">
+    <div class="marker">Part 02<br>Locked</div>
+    <div>
+      <h2>The decisions</h2>
+      <p class="section-note">Three forks you chose, plus three principles I set. These bound everything below.</p>
+    </div>
+  </div>
+
+  <article class="record">
+    <h3>Authoring — hand-written HTML with kit elements</h3>
+    <p class="origin">Your call · 24 Aug 2026</p>
+    <p>An article is an HTML file that uses newskit's custom elements and classes directly. <strong>No render layer, no markdown step</strong> — keeps the no-build conviction and gives full layout control. An AI author emits the HTML; the kit supplies a documented page skeleton and a fixed component vocabulary so the output stays consistent.</p>
+  </article>
+
+  <article class="record">
+    <h3>Identity — appkit's look, tuned for a news feeling</h3>
+    <p class="origin">Your call (corrected) · 24 Aug 2026</p>
+    <p>Not a warm-paper magazine and not a serif print skin — <em>appkit</em>: the same seeds, rounded surfaces, hairline rules, <code>--accent</code>, Inter for reading and Outfit for labels. The one deliberate nod to the reference is its <strong>headlines</strong> — big, condensed, uppercase (Oswald) — the part you called cool. They carry the news feeling together with the layout and hierarchy, without touching appkit's palette or body text. <em>This page is that look.</em></p>
+    <div class="highlight">
+      <p><span class="label">Consequence for the design rules</span>Because we stay in appkit's rounded world, the "no thick colored border on a rounded surface" rule applies in full. Entry cards get their accent from the <em>eyebrow colour</em> and a subtle accent-tint block (like this one), never a 3px colored stripe. The one thick rule we do keep is <em>neutral</em> and flat: the 2px masthead underline.</p>
+    </div>
+  </article>
+
+  <article class="record">
+    <h3>Scope — articles + a hub + article metadata</h3>
+    <p class="origin">Your call · 24 Aug 2026</p>
+    <p>Core is: the reading layout &amp; components, a hub (index of article cards), and per-article metadata — OpenGraph / Twitter / schema.org <code>Article</code> plus reading-time. A feed (RSS/Atom) and tags/series are designed-for but documented as a later extension, not built in v1.</p>
+  </article>
+
+  <article class="record warm">
+    <h3>Principles I set (veto any)</h3>
+    <p class="origin">Assumed, pending your nod</p>
+    <p><span class="label">Credibility is the kit's job</span>Newskit owns the trust primitives — sources, provenance, a method/disclosure block, the claim↔evidence pairing. That is what makes an AI-researched article defensible, so it belongs in the shared kit.</p>
+    <p><span class="label">The AI pipeline is separate</span>Researching and writing is a different project (a tool, later). Newskit <em>renders</em> and <em>structures</em>; it does not generate.</p>
+    <p><span class="label">Prefix stays <code>sac-*</code></span>One component family across both kits, so appkit and newskit read as one ecosystem.</p>
+  </article>
+</section>
+
+<!-- ============ COMPONENTS ============ -->
+<section class="section">
+  <div class="section-head">
+    <div class="marker">Part 03<br>The kit</div>
+    <div>
+      <h2>Article primitives</h2>
+      <p class="section-note">Abstracted from the reference's recurring blocks, styled in appkit tokens. Each is a custom element with a CSS-class fallback.</p>
+    </div>
+  </div>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>Element</th><th>Reference block</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>sac-masthead</code></td><td>kicker · H1 · standfirst · meta</td><td>Article head: eyebrow, display title, subtitle, dateline.</td></tr>
+      <tr><td><code>sac-section-head</code></td><td>stratum-head</td><td>Marker/eyebrow + H2 + note, accented.</td></tr>
+      <tr><td><code>sac-record</code></td><td>.record</td><td>Structured entry: title, origin, labeled fields, an accent-tint analysis block.</td></tr>
+      <tr><td><code>sac-sources</code></td><td>.srcs</td><td><strong>First-class citation list</strong> — rendered as scannable chips (domain · date), the credibility spine.</td></tr>
+      <tr><td><code>sac-cite</code></td><td>— (new, from review)</td><td>Inline citation marker → the record's source list. The cheapest large trust win.</td></tr>
+      <tr><td><code>sac-provenance</code></td><td>— (new, from review)</td><td>Under-title strip: researched date · method · N sources · N claims.</td></tr>
+      <tr><td><code>sac-toc</code></td><td>— (new)</td><td>Persistent left chapter rail — always visible, tracks the current section. (This page's own left rail is one.)</td></tr>
+      <tr><td><code>sac-callout</code></td><td>.method</td><td>Aside — with a distinct <code>method</code>/<code>disclosure</code> signature (warm accent) as the trust anchor.</td></tr>
+      <tr><td><code>sac-pullquote</code></td><td>.pull</td><td>Display-weight emphasis line.</td></tr>
+      <tr><td><code>sac-card-grid</code> / <code>sac-card</code></td><td>.moves</td><td>Numbered or plain card matrix.</td></tr>
+      <tr><td><code>sac-figure</code></td><td>—</td><td>Image/media with caption + credit (new).</td></tr>
+      <tr><td><code>sac-colophon</code></td><td>footer</td><td>Provenance: date, method, licence.</td></tr>
+      <tr><td><code>sac-article</code></td><td>.wrap</td><td>Reading container: measure &amp; rhythm.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Reused straight from appkit: the tokens, <code>sac-icon</code>, the caption utility, and — for hub chrome if wanted — <code>sac-nav</code> / <code>sac-footer</code>.</p>
+
+  <!-- SPECIMEN: the credibility spine, rendered (the review's key gap) -->
+  <h3 class="subhead">Specimen — the credibility spine, rendered</h3>
+  <p>The flagship: an entry whose every claim resolves to a source. Inline <code>sac-cite</code> markers point into a chip-styled source list, and a provenance strip states how the piece was made. <em>(Demo content; example.* placeholders stand in for real sources.)</em></p>
+  <div class="provenance">
+    <span><b>Researched</b> 24 Aug 2026</span>
+    <span><b>Method</b> multi-source review</span>
+    <span><b>Sources</b> 3</span>
+    <span><b>Claims</b> 2</span>
+  </div>
+  <article class="record">
+    <h3>A standby facility existed for decades</h3>
+    <p class="origin">Documented record · declassified</p>
+    <p>A complete relocation facility operated beneath a civilian site for thirty years<a class="cite" href="#s1">1</a>, sustained by a front company doing genuine work as cover<a class="cite" href="#s2">2</a>. It was ended not by a leak but by ordinary reporting — records, local knowledge, interviews<a class="cite" href="#s3">3</a>.</p>
+    <div class="highlight">
+      <p><span class="label">Why it anchors the claim</span>Every element a weaker narrative would only assert is here as fact — and it was <em>found</em>, which is what a documented record looks like. The evidence sits one tap away, below.</p>
+    </div>
+    <div class="srcs">
+      <span class="srcs-label">Sources</span>
+      <a href="#s1">example.org · 1992</a>
+      <a href="#s2">archive.example · 2017</a>
+      <a href="#s3">press.example · 1992</a>
+    </div>
+  </article>
+  <div class="callout method">
+    <p><span class="label">Method / disclosure</span>The warm signature marks how a piece was made — distinct from an ordinary aside, so the trust anchor is learnable at a glance. This is where an AI-researched article states its process, model and limits.</p>
+  </div>
+
+  <h3 class="subhead">The editorial layer</h3>
+  <div class="grid two">
+    <div class="cell"><h4>Fonts</h4><p>Three roles: <strong>Oswald</strong> (condensed, uppercase, 500/600 only) for headlines — the reference's signature; <strong>Inter</strong> for reading; <strong>Outfit</strong> for labels. Only Oswald is new; both others are appkit's. Self-hosted &amp; subset like the others, no CDN.</p></div>
+    <div class="cell"><h4>Tokens</h4><p>Appkit's seeds and derived tokens verbatim: <code>--bg</code>, <code>--tile</code>, <code>--accent</code>, <code>--border</code>, radii. A retheme of appkit rethemes newskit.</p></div>
+    <div class="cell"><h4>Reading layer</h4><p>What's new: a ~40rem prose measure (~68ch), body on <code>--text</code> (not muted), an article type scale, the section/record/sources rhythm.</p></div>
+    <div class="cell"><h4>Theming</h4><p>light / dark / auto for free — same engine, same <code>data-theme</code>. Contrast re-solved per scheme so no tier drops below AA.</p></div>
+  </div>
+
+  <div class="callout">
+    <p><span class="label">Hard rules from the design review (Fable + Grok)</span>Body copy is primary <code>--text</code>, muted is for standfirst/notes/origins only. Prose measure ≤ ~40rem — the widest lines must not be the dense evidence cards. Micro-type floor 0.7rem; every text tier ≥ AA in <em>both</em> schemes (no shared mix ratio across light/dark). One display moment per viewport — analytical prose sits on bare ground between record tiles, so the middle never reads as a settings screen. The masthead's 2px rule is neutral, not colored.</p>
+  </div>
+</section>
+
+<!-- ============ HUB + CREDIBILITY ============ -->
+<section class="section">
+  <div class="section-head">
+    <div class="marker">Part 04<br>Publishing</div>
+    <div>
+      <h2>The hub &amp; the trust layer</h2>
+      <p class="section-note">What turns a folder of article pages into a publication — and the review's verdict: this is the real design job.</p>
+    </div>
+  </div>
+  <p><strong>The hub</strong> is a reusable index: a front page of article cards (kicker, title, standfirst, dateline, reading-time, source count), built with the kit and appkit's tile look. Adding an article is adding a page and a card — no CMS, no database.</p>
+  <p><strong>Article metadata</strong> ships as a documented <code>&lt;head&gt;</code> block: OpenGraph + Twitter cards for link previews, schema.org <code>Article</code> for search, a computed reading-time.</p>
+  <p><strong>The trust layer is the differentiator</strong> — and both reviewers said it must be <em>designed</em>, not merely structural. It is four visible primitives, shown in the specimen above: inline <code>sac-cite</code> markers so a claim carries its evidence; <code>sac-sources</code> as scannable chips (domain · accessed date) so "this claim has three sources" reads at a glance; a <code>sac-provenance</code> strip under the title; and a <code>method/disclosure</code> callout with its own warm signature. The reference lives this — every claim resolves to a link, including claims it rates unsupported. That honesty is a feature of the format, and the kit makes it the path of least resistance. <em>No "AI purple/glow" — trust reads as timestamps, structure and evidence density, not decoration.</em></p>
+</section>
+
+<!-- ============ CONTENT MODEL ============ -->
+<section class="section">
+  <div class="section-head">
+    <div class="marker">Part 05<br>Writing one</div>
+    <div>
+      <h2>The article, as a file</h2>
+      <p class="section-note">Hand-authored HTML — the shape an author (human or AI) fills in.</p>
+    </div>
+  </div>
+  <p>Every article is one self-contained page: a documented <code>&lt;head&gt;</code> (metadata), links to the vendored appkit + <code>newskit.css</code>, then the body assembled from the primitives. A skeleton and a filled reference (the demo) ship in the repo, copy-to-start.</p>
+  <div class="callout scroll">
+<p class="skeleton">&lt;sac-article&gt;
+  &lt;sac-masthead kicker="Research file" …&gt;…&lt;/sac-masthead&gt;
+  &lt;sac-provenance researched="2026-08-24" sources="3" claims="2"&gt;&lt;/sac-provenance&gt;
+  &lt;sac-callout kind="method"&gt;…&lt;/sac-callout&gt;
+
+  &lt;sac-section-head&gt;What exists&lt;/sac-section-head&gt;
+  &lt;sac-record&gt;
+    &lt;h3&gt;A standby facility existed for decades&lt;/h3&gt;
+    &lt;p class="origin"&gt;Documented record · declassified&lt;/p&gt;
+    &lt;p&gt;A complete relocation facility operated for thirty years&lt;sac-cite href="#s1"&gt;1&lt;/sac-cite&gt;…&lt;/p&gt;
+    &lt;sac-sources&gt;
+      &lt;a href="#s1"&gt;example.org · 1992&lt;/a&gt;
+    &lt;/sac-sources&gt;
+  &lt;/sac-record&gt;
+
+  &lt;sac-pullquote&gt;The disturbing material is in Layer 1&lt;/sac-pullquote&gt;
+  &lt;sac-colophon&gt;…&lt;/sac-colophon&gt;
+&lt;/sac-article&gt;</p>
+  </div>
+</section>
+
+<!-- ============ DELIVERY ============ -->
+<section class="section">
+  <div class="section-head">
+    <div class="marker">Part 06<br>Shipping</div>
+    <div>
+      <h2>Repo, build, release</h2>
+      <p class="section-note">Same discipline as appkit — because it is the same discipline.</p>
+    </div>
+  </div>
+  <div class="scroll">
+  <table class="tbl">
+    <thead><tr><th>Concern</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>Repo layout</td><td><code>newskit/</code> (the layer) · <code>styleguide/</code> · <code>demo/</code> (a mini-publication) · a vendored <code>kit/</code> from appkit. Mirrors appkit's three-part shape.</td></tr>
+      <tr><td>Build</td><td>None. Plain files, <code>npx serve .</code>, F5. Packaging only server-side in the release Action.</td></tr>
+      <tr><td>Fonts</td><td>Self-host + subset Oswald into <code>newskit/fonts/</code> exactly like appkit does Inter/Outfit — the Google CDN link is scratch-only.</td></tr>
+      <tr><td>Release</td><td><code>vX.Y.Z</code> tag → Action zips <code>newskit/</code> + <code>LICENSE</code>, writes <code>newskit/VERSION</code>, GitHub release. Appkit's workflow, copied.</td></tr>
+      <tr><td>Consuming</td><td>A publication vendors <em>both</em> kits (appkit under <code>kit/</code>, newskit under <code>newskit/</code>), kept on aligned versions. A <code>CONSUMING.md</code> spells it out.</td></tr>
+      <tr><td>Appkit dependency</td><td>Newskit re-vendors appkit on each appkit release — the same consumer-notify flow already in place.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ PHASING ============ -->
+<section class="section">
+  <div class="section-head">
+    <div class="marker">Part 07<br>Order</div>
+    <div>
+      <h2>Build order</h2>
+      <p class="section-note">Smallest first; each phase is usable on its own. The review moved the cite/sources UI up into the core — it is the thesis, not a garnish.</p>
+    </div>
+  </div>
+  <ol class="phases">
+    <li><h4>Reading layer</h4><p><code>newskit.css</code> on appkit's tokens: the ~40rem measure, prose rhythm, article type scale, per-scheme AA contrast. Proves the look in light/dark.</p></li>
+    <li><h4>Core primitives + the trust layer</h4><p><code>sac-article</code>, <code>sac-masthead</code>, <code>sac-section-head</code>, <code>sac-record</code>, <code>sac-sources</code> (chips), <code>sac-cite</code>, <code>sac-provenance</code>, <code>sac-callout</code> (method signature), <code>sac-pullquote</code>, <code>sac-figure</code>, <code>sac-colophon</code>.</p></li>
+    <li><h4>The demo article</h4><p>The reference piece re-typeset with the primitives — end-to-end proof and copy-to-start reference.</p></li>
+    <li><h4>Styleguide</h4><p>Every primitive live, with attribute/slot tables — built with the kit, appkit-style.</p></li>
+    <li><h4>Hub + metadata</h4><p>Publication index, OG/schema.org <code>Article</code>, reading-time, source counts on cards.</p></li>
+    <li><h4>Release plumbing</h4><p>The Action, <code>VERSION</code>, self-hosted fonts, <code>CONSUMING.md</code>, the two-kit vendoring recipe.</p></li>
+    <li><h4>Documented extensions</h4><p>Feed (RSS/Atom), tags/series, source access-dates — designed-for now, built when wanted.</p></li>
+  </ol>
+</section>
+
+<!-- ============ NOT ============ -->
+<section class="essay">
+  <p class="pull">What newskit is not</p>
+  <p>No build step, ever — plain files and F5, like appkit. No CMS or backend; a publication is static pages. No markdown parser (you chose hand-HTML). No AI-authoring inside the kit — that seam stays clean. No feed or tag system in v1 — designed-for, deferred. And <strong>no separate skin</strong>: newskit shares appkit's palette and body type; the news feeling comes from structure and the condensed headlines, not from a different colour world.</p>
+</section>
+
+<footer>
+  Newskit — project plan · drafted 24 Aug 2026 · sister of SACRVM APPKIT · design review folded in (Fable + Grok)<br>
+  Decisions: authoring = hand-HTML · identity = appkit look + Oswald headlines · scope = articles + hub + metadata<br>
+  Open for review: the three set principles (credibility in-kit · AI pipeline separate · <code>sac-*</code> prefix)
+</footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  const links=[...document.querySelectorAll('.toc a')];
+  const secs=[...document.querySelectorAll('.wrap .section, .wrap .essay')];
+  secs.forEach((s,i)=>{ if(links[i]) s.id=links[i].getAttribute('href').slice(1); });
+  // Explicit smooth-scroll on click — the native anchor jump did not fire for
+  // the last item; scrollIntoView is reliable for every link, first to last.
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  links.forEach(a=>a.addEventListener('click',(e)=>{
+    const el=document.getElementById(a.getAttribute('href').slice(1));
+    if(el){ e.preventDefault();
+      const top=el.getBoundingClientRect().top+window.scrollY-16; // scrollTo auto-clamps to max
+      window.scrollTo({top,behavior:reduce?'auto':'smooth'});
+      history.replaceState(null,'',a.getAttribute('href'));
+    }
+  }));
+  const setActive=(idx)=>{ links.forEach((l,i)=>{ l.classList.toggle('active',i===idx); l.classList.toggle('done',i<idx); }); };
+  // active = the last section whose top has crossed the 28% reading line;
+  // near the page bottom, force the final section active so the last item lights up.
+  const onScroll=()=>{
+    const line=window.innerHeight*0.28; let idx=0;
+    secs.forEach((s,i)=>{ if(s.getBoundingClientRect().top<=line) idx=i; });
+    if(window.innerHeight+window.scrollY>=document.body.scrollHeight-4) idx=secs.length-1;
+    setActive(idx);
+  };
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+})();
+</script>
