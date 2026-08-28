@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEWSKIT — Article primitives</title>
+    <link rel="stylesheet" href="../kit/css/ui.css">
+    <link rel="stylesheet" href="../newskit/newskit.css">
+    <style>
+        /* Page chrome only — the whole specimen below is kit CSS. */
+        .theme-corner { position: fixed; top: 1rem; right: 1rem; z-index: 10; }
+    </style>
+    <script defer src="../kit/js/lib/globals.js"></script>
+    <script defer src="../kit/js/components/sac-theme-toggle.js"></script>
+    <script defer src="../newskit/js/components/sac-section-head.js"></script>
+    <script defer src="../newskit/js/components/sac-cite.js"></script>
+    <script defer src="../newskit/js/components/sac-sources.js"></script>
+    <script defer src="../newskit/js/components/sac-provenance.js"></script>
+    <script defer src="../newskit/js/components/sac-toc.js"></script>
+</head>
+<body>
+    <div class="theme-corner"><sac-theme-toggle></sac-theme-toggle></div>
+
+    <div class="news-shell">
+
+        <sac-toc brand="Newskit"></sac-toc>
+
+        <sac-article>
+
+            <sac-masthead>
+                <p class="kicker">Newskit styleguide · Phase 2 · Every primitive, live</p>
+                <h1>The article primitives</h1>
+                <p class="standfirst">Masthead, section heads, records, and the trust
+                layer — cite markers, source chips, the provenance strip, the method
+                callout. Everything on this page is a kit primitive; the rail on the
+                left is one too.</p>
+                <div class="meta">
+                    <span>Phase 2 specimen</span>
+                    <span>Hand-authored HTML</span>
+                    <span>Zero build</span>
+                </div>
+            </sac-masthead>
+
+            <sac-provenance researched="2026-08-28" method="extracted from the approved template"
+                            sources="3" claims="2"></sac-provenance>
+
+            <sac-callout kind="method">
+                <p><span class="label">Method / disclosure</span>The warm signature marks
+                how a piece was made — distinct from an ordinary aside, so the trust
+                anchor is learnable at a glance. This is where a researched article
+                states its process, model and limits. The strip above it renders from
+                four attributes on <code>sac-provenance</code>.</p>
+            </sac-callout>
+
+            <sac-section-head marker="Part 01|The head">
+                <h2>Masthead &amp; provenance</h2>
+                <p class="note">The article head is hand-written children — kicker, H1,
+                standfirst, meta dateline — inside one element that draws the 2px
+                neutral rule.</p>
+            </sac-section-head>
+
+            <p>The masthead above is the strongest single news signal on the page:
+            the condensed uppercase display title over a flat <strong>neutral</strong>
+            2px rule — deliberately not a colored stripe, because we stay in appkit's
+            rounded world. The dateline dots take the accent; the rule does not.</p>
+
+            <sac-section-head marker="Part 02|The spine">
+                <h2>Records &amp; the trust layer</h2>
+                <p class="note">A structured entry whose every claim resolves to a
+                source — the credibility spine, rendered.</p>
+            </sac-section-head>
+
+            <sac-record>
+                <h3>A standby facility existed for decades</h3>
+                <p class="origin">Documented record · declassified</p>
+                <p>A complete relocation facility operated beneath a civilian site for
+                thirty years<sac-cite href="#s1">1</sac-cite>, sustained by a front
+                company doing genuine work as cover<sac-cite href="#s2">2</sac-cite>.
+                It was ended not by a leak but by ordinary reporting — records, local
+                knowledge, interviews<sac-cite href="#s3">3</sac-cite>.</p>
+                <div class="highlight">
+                    <p><span class="label">Why it anchors the claim</span>Every element
+                    a weaker narrative would only assert is here as fact — and it was
+                    <em>found</em>, which is what a documented record looks like. The
+                    evidence sits one tap away, below.</p>
+                </div>
+                <sac-sources>
+                    <a id="s1" href="#s1">example.org · 1992</a>
+                    <a id="s2" href="#s2">archive.example · 2017</a>
+                    <a id="s3" href="#s3">press.example · 1992</a>
+                </sac-sources>
+            </sac-record>
+
+            <sac-record warm>
+                <h3>A warm record</h3>
+                <p class="origin">Attention state · unresolved</p>
+                <p><span class="label">Open question</span>The <code>warm</code>
+                attribute shifts a record's eyebrows — origin and labels — to the warm
+                state ink for entries that need attention. The surface itself stays
+                neutral; state never becomes a border.</p>
+            </sac-record>
+
+            <sac-pullquote>Trust reads as structure, not decoration</sac-pullquote>
+
+            <p>Between the tiles, analytical prose sits on bare ground — one display
+            moment per viewport, so the middle of an article never reads as a
+            settings screen. The pullquote above carries the display voice at
+            paragraph scale; the cite markers in the record resolve to the chip list
+            at its foot — try one<a class="sac-cite" href="#s1">1</a>, this one is
+            the hand-authored <code>&lt;a class="sac-cite"&gt;</code> fallback.</p>
+
+            <sac-section-head marker="Part 03|The rest">
+                <h2>Figure, callout, colophon</h2>
+                <p class="note">The quieter furniture — media with credit, the plain
+                aside, and the provenance footer.</p>
+            </sac-section-head>
+
+            <sac-figure>
+                <svg viewBox="0 0 640 240" role="img" aria-label="Placeholder diagram"
+                     style="width:100%;height:auto;display:block;border-radius:6px;background:color-mix(in srgb,var(--fg) 5%,transparent)">
+                    <g fill="none" stroke="var(--accent)" stroke-width="2">
+                        <rect x="40" y="40" width="240" height="160" rx="6" opacity=".7"/>
+                        <line x1="320" y1="70" x2="600" y2="70" opacity=".5"/>
+                        <line x1="320" y1="110" x2="560" y2="110" opacity=".35"/>
+                        <line x1="320" y1="150" x2="580" y2="150" opacity=".35"/>
+                        <line x1="320" y1="190" x2="520" y2="190" opacity=".2"/>
+                    </g>
+                </svg>
+                <figcaption>A figure carries its caption in reading ink one step down,
+                and its credit in the label voice. <span class="credit">Credit ·
+                Newskit specimen</span></figcaption>
+            </sac-figure>
+
+            <sac-callout>
+                <p><span class="label">Plain aside</span>The unmarked callout keeps the
+                cool accent tint. Only <code>kind="method"</code> and
+                <code>kind="disclosure"</code> take the warm signature — the
+                distinction is the point.</p>
+            </sac-callout>
+
+            <sac-section-head>A bare-text section head</sac-section-head>
+
+            <p>The head above was written as
+            <code>&lt;sac-section-head&gt;text&lt;/sac-section-head&gt;</code> — the
+            component wraps bare text into the H2, and the rail on the left picked it
+            up as chapter 04 with a slugged anchor. No marker, no note: both are
+            optional.</p>
+
+            <sac-colophon>
+                Newskit — article primitives specimen · Phase 2 · built with the kit it
+                proves<br>
+                Every block above: sac-masthead · sac-provenance · sac-callout ·
+                sac-section-head · sac-record · sac-cite · sac-sources ·
+                sac-pullquote · sac-figure · sac-toc · sac-colophon
+            </sac-colophon>
+
+        </sac-article>
+
+    </div>
+</body>
+</html>

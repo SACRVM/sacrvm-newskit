@@ -233,11 +233,12 @@ sac-article img, .sac-article img {
 }
 
 /* --------------------------------------------------------------------------
-   7. Reading-layer type utilities — the two masthead type tiers that are
-   pure typography (the masthead BLOCK — 2px neutral rule, meta-row — is
-   sac-masthead, phase 2). Prefixed like appkit's .sac-caption.
+   7. Reading-layer type utilities — the standalone-prefixed forms (.sac-*)
+   and the component-scoped forms (inside sac-masthead) share one rule each,
+   so the two can never drift.
    -------------------------------------------------------------------------- */
-.sac-kicker {
+.sac-kicker,
+sac-masthead .kicker, .sac-masthead .kicker {
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
     font-size: 0.74rem;
@@ -246,10 +247,459 @@ sac-article img, .sac-article img {
     color: var(--accent-text);
     margin: 0 0 1.1rem;
 }
-.sac-standfirst {
+.sac-standfirst,
+sac-masthead .standfirst, .sac-masthead .standfirst {
     font-size: 1.25rem;
     line-height: 1.5;
     color: var(--text-standfirst);
     max-width: var(--measure);
     margin: 0 0 1.5rem;
+}
+
+/* ==========================================================================
+   PHASE 2 — the article primitives + the trust layer.
+   Every primitive is styled here in the light DOM (element selector + class
+   fallback, identical treatment), so hand-authored HTML needs no JS to look
+   right; the components in newskit/js/components/ only add behaviour and
+   structure sugar (sac-toc scroll-spy, sac-provenance from attributes …).
+   Micro-type: the template's .68rem/.62rem labels are lifted to the review's
+   0.7rem floor here — visually negligible, rule-compliant.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   8. sac-masthead — kicker · display title · standfirst · meta dateline.
+   The 2px rule is NEUTRAL and flat: the one thick line in the system, and
+   the strongest single "news" signal on the page (per the design review,
+   never a colored stripe).
+   -------------------------------------------------------------------------- */
+sac-masthead, .sac-masthead {
+    display: block;
+    padding: 4rem 0 2rem;
+    border-bottom: 2px solid color-mix(in srgb, var(--fg) 78%, transparent);
+}
+sac-masthead h1, .sac-masthead h1 { margin-top: 0; }
+sac-masthead .meta, .sac-masthead .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+sac-masthead .meta span, .sac-masthead .meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+sac-masthead .meta span::before, .sac-masthead .meta span::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   9. sac-section-head — accent marker + H2 + note. The marker sits in a
+   5rem left column; every other child flows in the right column, so no
+   wrapper div is needed. Bare text content is wrapped into an <h2> by
+   sac-section-head.js.
+   -------------------------------------------------------------------------- */
+sac-section-head, .sac-section-head {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    column-gap: 1.4rem;
+    align-items: start;
+    margin: 3rem 0 1.6rem;
+    scroll-margin-top: 1.5rem;      /* chapter-rail jump target */
+}
+sac-section-head > *, .sac-section-head > * { grid-column: 2; }
+sac-section-head > .marker, .sac-section-head > .marker {
+    grid-column: 1;
+    grid-row: 1;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    line-height: 1.45;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin: 0;
+    padding-top: 0.55rem;
+    border-top: 1px solid var(--accent);
+}
+sac-section-head h2, .sac-section-head h2 { margin: 0 0 0.4rem; }
+sac-section-head .note, .sac-section-head .note {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0;
+    max-width: 36rem;
+}
+@media (max-width: 38rem) {
+    sac-section-head, .sac-section-head { grid-template-columns: 1fr; row-gap: 0.5rem; }
+    sac-section-head > *, .sac-section-head > *,
+    sac-section-head > .marker, .sac-section-head > .marker { grid-column: 1; grid-row: auto; }
+}
+
+/* --------------------------------------------------------------------------
+   10. sac-record — the structured entry: appkit tile surface, hairline, NO
+   thick colored border. Accent lives in the eyebrow ink and the soft-tint
+   analysis block. `warm` (attribute or class) shifts the eyebrows to the
+   warm state ink.
+   -------------------------------------------------------------------------- */
+sac-record, .sac-record {
+    display: block;
+    background: var(--tile);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    padding: 1.4rem 1.5rem 1.2rem;
+    margin: 1.1rem 0;
+}
+sac-record h3, .sac-record h3 { margin: 0 0 0.25rem; }
+sac-record p, .sac-record p { font-size: 0.97rem; margin: 0 0 0.8rem; }
+sac-record p:last-child, .sac-record p:last-child { margin-bottom: 0; }
+
+/* origin line — where a record's facts come from (dateline of the entry) */
+sac-record .origin, .sac-record .origin,
+sac-article .origin, .sac-article .origin {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 0.9rem;
+}
+/* field label — the accent eyebrow above a labeled statement */
+sac-record .label, .sac-record .label,
+sac-callout .label, .sac-callout .label {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    display: block;
+    margin-bottom: 0.2rem;
+}
+sac-record[warm] .label, sac-record[warm] .origin,
+.sac-record.warm .label, .sac-record.warm .origin,
+sac-record.warm .label, sac-record.warm .origin {
+    color: var(--accent-warm-text);
+}
+/* the analysis highlight — subtle accent tint, never a border stripe */
+sac-record .highlight, .sac-record .highlight {
+    background: var(--accent-soft);
+    border-radius: var(--radius-m);
+    padding: 0.9rem 1.05rem;
+    margin-top: 0.9rem;
+}
+sac-record .highlight p, .sac-record .highlight p { font-size: 0.94rem; }
+
+/* --------------------------------------------------------------------------
+   11. sac-cite — the inline citation marker: a claim carries its evidence.
+   sac-cite.js wraps the marker text in an <a href>; hand-authored form is
+   <a class="sac-cite" href="#s1">1</a>. 0.66em keeps the marker at the
+   0.7rem floor against the 17px reading size.
+   -------------------------------------------------------------------------- */
+sac-cite { display: inline; }
+sac-cite a, a.sac-cite {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.66em;
+    vertical-align: 0.4em;
+    line-height: 0;
+    color: var(--accent-text);
+    background: var(--accent-soft);
+    border-radius: var(--radius-s);
+    padding: 0.15em 0.32em;
+    margin-left: 0.12em;
+    text-decoration: none;
+}
+sac-cite a:hover, a.sac-cite:hover { background: var(--accent-tint); }
+
+/* --------------------------------------------------------------------------
+   12. sac-sources — the credibility spine: scannable chips (domain · date),
+   not a dim link run. sac-sources.js prepends the "Sources" label when the
+   author didn't write one.
+   -------------------------------------------------------------------------- */
+sac-sources, .sac-sources {
+    margin: 0.95rem 0 0;
+    padding: 0.8rem 0 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+sac-sources .label, .sac-sources .label {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 0.25rem;
+}
+sac-sources a, .sac-sources a {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    background: var(--tile);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    padding: 0.22rem 0.55rem;
+    color: var(--text-muted);
+    text-decoration: none;
+}
+sac-sources a:hover, .sac-sources a:hover {
+    border-color: var(--border-strong);
+    color: var(--accent-text);
+}
+
+/* --------------------------------------------------------------------------
+   13. sac-provenance — the under-title strip: researched date · method ·
+   N sources · N claims. sac-provenance.js renders the spans from
+   attributes; hand-authored spans work identically.
+   -------------------------------------------------------------------------- */
+sac-provenance, .sac-provenance {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.95rem;
+    align-items: center;
+    margin: 1.1rem 0;
+    padding: 0.65rem 0.9rem;
+    background: var(--tile);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+}
+sac-provenance b, .sac-provenance b,
+sac-provenance strong, .sac-provenance strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   14. sac-callout — the aside. kind="method" / kind="disclosure" carries
+   the WARM trust-anchor signature: where a researched piece states its
+   process, model and limits — learnable at a glance, distinct from an
+   ordinary aside.
+   -------------------------------------------------------------------------- */
+sac-callout, .sac-callout {
+    display: block;
+    margin: 1.3rem 0;
+    padding: 1.1rem 1.3rem;
+    background: var(--accent-soft);
+    border-radius: var(--radius-l);
+}
+sac-callout p, .sac-callout p {
+    margin: 0 0 0.55rem;
+    font-size: 0.95rem;
+    max-width: 38rem;
+}
+sac-callout p:last-child, .sac-callout p:last-child { margin: 0; }
+sac-callout[kind="method"], sac-callout[kind="disclosure"],
+.sac-callout.method, .sac-callout.disclosure {
+    background: var(--warm-soft);
+}
+sac-callout[kind="method"] .label, sac-callout[kind="disclosure"] .label,
+.sac-callout.method .label, .sac-callout.disclosure .label {
+    color: var(--accent-warm-text);
+}
+
+/* --------------------------------------------------------------------------
+   15. sac-pullquote — the display-weight emphasis line.
+   -------------------------------------------------------------------------- */
+sac-pullquote, .sac-pullquote {
+    display: block;
+    font-family: var(--display-font);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 3.8vw, 2.1rem);
+    line-height: 1.15;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    color: var(--accent-text);
+    margin: 2rem 0 1.1rem;
+    max-width: 34rem;
+}
+
+/* --------------------------------------------------------------------------
+   16. sac-figure — image/media with caption + credit.
+   -------------------------------------------------------------------------- */
+sac-figure, figure.sac-figure {
+    display: block;
+    margin: 1.6rem 0;
+}
+sac-figure figcaption, figure.sac-figure figcaption,
+sac-figure .caption, figure.sac-figure .caption {
+    margin-top: 0.55rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: var(--measure);
+}
+sac-figure .credit, figure.sac-figure .credit {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   17. sac-colophon — the provenance footer: date, method, licence.
+   -------------------------------------------------------------------------- */
+sac-colophon, .sac-colophon {
+    display: block;
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    line-height: 1.9;
+}
+
+/* --------------------------------------------------------------------------
+   18. sac-toc + .news-shell — the persistent left chapter rail. The shell
+   is the page grid (rail + article); sac-toc.js builds the numbered list
+   from the article's sac-section-heads and tracks the reading position.
+   Rail geometry: track line and every bubble are pseudos of the SAME
+   anchor with the same left origin (--rail), so their centres are
+   identical by construction — they cannot drift. Needs the *::before/
+   *::after box-sizing completion (section 2).
+   -------------------------------------------------------------------------- */
+.news-shell {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    max-width: 74rem;
+    margin: 0 auto;
+}
+.news-shell > sac-article, .news-shell > .sac-article {
+    max-width: 52rem;
+    margin-inline: 0;
+    padding: 0 2rem 6rem 2.5rem;
+    min-width: 0;
+}
+/* padding-top aligns the rail's top with the masthead headline at the top
+   of the page; it stays as breathing room once stuck. */
+sac-toc, .sac-toc {
+    display: block;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 6.2rem 1rem 2rem 1.6rem;
+    border-right: 1px solid var(--border);
+}
+sac-toc .brand, .sac-toc .brand {
+    font-family: var(--display-font);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    margin: 0 0 0.2rem;
+}
+sac-toc .rail-label, .sac-toc .rail-label {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0 0 1.6rem;
+}
+sac-toc ol, .sac-toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 1.5rem;
+    position: relative;
+    --rail: 0.5rem;      /* the shared centre line of track + bubbles */
+}
+sac-toc li, .sac-toc li { position: relative; margin: 0; }
+sac-toc a, .sac-toc a {
+    position: relative;
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    padding: 0.42rem 0.5rem;
+    border-radius: var(--radius-m);
+    text-decoration: none;
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    transition: color 0.15s;
+}
+/* the track: from this bubble's centre down to the next one */
+sac-toc a::after, .sac-toc a::after {
+    content: "";
+    position: absolute;
+    left: calc(var(--rail) - 1.5rem - 1px);
+    top: 50%;
+    height: 100%;
+    width: 2px;
+    background: var(--border);
+    z-index: 0;
+}
+sac-toc li:last-child a::after, .sac-toc li:last-child a::after { display: none; }
+sac-toc a::before, .sac-toc a::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--rail) - 1.5rem - 0.4rem);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--border-strong);   /* neutral — not a colored border */
+    z-index: 1;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+sac-toc a .n, .sac-toc a .n {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    min-width: 1.1rem;
+    letter-spacing: 0.03em;
+    transition: color 0.15s;
+}
+sac-toc a:hover, .sac-toc a:hover { color: var(--text); }
+sac-toc a:hover::before, .sac-toc a:hover::before { border-color: var(--text-muted); }
+sac-toc a.done, .sac-toc a.done { color: var(--text-muted); }
+sac-toc a.done::before, .sac-toc a.done::before {
+    background: color-mix(in srgb, var(--accent) 55%, var(--bg));
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--bg));
+}
+sac-toc a.active, .sac-toc a.active { color: var(--accent-text); }
+sac-toc a.active::before, .sac-toc a.active::before {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+sac-toc a.active .n, .sac-toc a.active .n { color: var(--accent-text); }
+@media (max-width: 60rem) {
+    .news-shell { grid-template-columns: 1fr; }
+    sac-toc, .sac-toc { display: none; }
+    .news-shell > sac-article, .news-shell > .sac-article {
+        margin-inline: auto;
+        padding: 0 1.5rem 6rem;
+    }
 }
