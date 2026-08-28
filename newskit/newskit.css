@@ -599,8 +599,14 @@ sac-colophon, .sac-colophon {
     padding: 0 2rem 6rem 2.5rem;
     min-width: 0;
 }
-/* padding-top aligns the rail's top with the masthead headline at the top
-   of the page; it stays as breathing room once stuck. */
+/* padding-top puts the brand wordmark's CAP TOP on the masthead H1's
+   cap top — the two text top edges sit flush on one horizontal line
+   (owner call, 2026-08-28). The offset is solvable statically because
+   the H1's clamp is always at its 6.5rem maximum wherever the rail is
+   visible (≥60rem); it assumes the canonical masthead (4rem top
+   padding, one-line kicker). Measured in-browser via canvas glyph
+   metrics, not derived from font tables. Once stuck, the padding is
+   breathing room. */
 sac-toc, .sac-toc {
     display: block;
     position: sticky;
@@ -608,7 +614,7 @@ sac-toc, .sac-toc {
     align-self: start;
     height: 100vh;
     overflow-y: auto;
-    padding: 6.2rem 1rem 2rem 1.6rem;
+    padding: 6.63rem 1rem 2rem 1.6rem;
     border-right: 1px solid var(--border);
 }
 sac-toc .brand, .sac-toc .brand {
