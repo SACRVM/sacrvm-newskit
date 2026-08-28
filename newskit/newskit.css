@@ -58,6 +58,8 @@
    2. Reset completion — appkit's base reset is `*` alone, which does not
    match pseudo-elements; a bordered ::before circle or ::after line then
    mis-centres (learned building the chapter rail). Additive, not a fork.
+   Fixed upstream after appkit v2.4.0 (master 9e2c230): drop this rule on
+   the first re-vendor whose ui.css already resets *::before/*::after.
    -------------------------------------------------------------------------- */
 *::before, *::after { box-sizing: border-box; }
 
