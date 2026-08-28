@@ -390,6 +390,13 @@ sac-record[warm] .label, sac-record[warm] .origin,
 sac-record.warm .label, sac-record.warm .origin {
     color: var(--accent-warm-text);
 }
+/* …but the sources label is trust-layer chrome, not a record eyebrow — it
+   stays muted even inside a warm record. */
+sac-record[warm] sac-sources .label, sac-record[warm] .sac-sources .label,
+.sac-record.warm sac-sources .label, .sac-record.warm .sac-sources .label,
+sac-record.warm sac-sources .label, sac-record.warm .sac-sources .label {
+    color: var(--text-muted);
+}
 /* the analysis highlight — subtle accent tint, never a border stripe */
 sac-record .highlight, .sac-record .highlight {
     background: var(--accent-soft);
