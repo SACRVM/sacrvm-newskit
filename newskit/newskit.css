@@ -55,13 +55,11 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Reset completion — appkit's base reset is `*` alone, which does not
-   match pseudo-elements; a bordered ::before circle or ::after line then
-   mis-centres (learned building the chapter rail). Additive, not a fork.
-   Fixed upstream after appkit v2.4.0 (master 9e2c230): drop this rule on
-   the first re-vendor whose ui.css already resets *::before/*::after.
+   2. Reset completion — no longer needed. Since appkit 2.5.0, ui.css resets
+   *::before/*::after too (a bordered ::before circle or ::after line would
+   otherwise mis-centre — learned building the chapter rail). Newskit's
+   downstream copy of the rule was dropped with that re-vendor.
    -------------------------------------------------------------------------- */
-*::before, *::after { box-sizing: border-box; }
 
 /* --------------------------------------------------------------------------
    3. Reading tokens.
@@ -585,7 +583,7 @@ sac-colophon, .sac-colophon {
    Rail geometry: track line and every bubble are pseudos of the SAME
    anchor with the same left origin (--rail), so their centres are
    identical by construction — they cannot drift. Needs the *::before/
-   *::after box-sizing completion (section 2).
+   *::after box-sizing reset (appkit ui.css since 2.5.0; see section 2).
    -------------------------------------------------------------------------- */
 .news-shell {
     display: grid;
