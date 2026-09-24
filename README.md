@@ -17,7 +17,9 @@ because that is what a researched article stands on.
 
 ## Status
 
-Scaffold. The build order is in [`ROADMAP.md`](ROADMAP.md); the full plan (with the design
+Phases 1–3 done: the reading layer (`newskit/newskit.css` + self-hosted Oswald), the article
+primitives with the trust layer, and the demo article (`demo/project-greek-island.html`). Live
+proof in `styleguide/`. The build order is in [`ROADMAP.md`](ROADMAP.md); the full plan (with the design
 decisions and the Fable + Grok design review) is the project-plan artifact linked there.
 
 ## Development

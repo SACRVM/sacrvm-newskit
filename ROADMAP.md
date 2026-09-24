@@ -20,11 +20,12 @@ it is the source of truth for the look, signed off by the owner.
 - Prefix stays `sac-*`. Reset is `*,*::before,*::after{box-sizing:border-box}`.
 
 ## Build order
-1. **Reading layer** — `newskit.css` on appkit's tokens: ~40rem prose measure, reading rhythm,
+1. **Reading layer** ✅ — `newskit.css` on appkit's tokens: ~40rem prose measure, reading rhythm,
    article type scale, per-scheme AA contrast, self-hosted Oswald. Proves the look in light/dark.
-2. **Core primitives + trust layer** — sac-article, sac-masthead, sac-section-head, sac-record,
+   Open: in light, the small `--accent-text` labels measure 3.7–4.1:1 (below AA 4.5:1); dark passes.
+2. **Core primitives + trust layer** ✅ — sac-article, sac-masthead, sac-section-head, sac-record,
    sac-sources, sac-cite, sac-provenance, sac-callout, sac-pullquote, sac-figure, sac-colophon, sac-toc.
-3. **The demo article** — the reference piece re-typeset; end-to-end proof + copy-to-start.
+3. **The demo article** ✅ — the reference piece re-typeset; end-to-end proof + copy-to-start.
 4. **Styleguide** — every primitive live, appkit-style, with attribute/slot tables.
 5. **Hub + metadata** — publication index, OG / schema.org Article, reading-time, source counts.
 6. **Release plumbing** — `newskit/VERSION`, the Action (present), CONSUMING.md, the two-kit
