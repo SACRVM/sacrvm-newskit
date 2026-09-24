@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEWSKIT</title>
+    <meta name="description" content="SACRVM NEWSKIT — a zero-dependency kit for long-form, source-backed articles, on SACRVM APPKIT's look.">
+    <link rel="stylesheet" href="kit/css/ui.css">
+    <link rel="stylesheet" href="newskit/newskit.css">
+    <style>
+        /* Interim entry page until the publication hub (phase 5) replaces it.
+           Page chrome only; the typography is newskit.css. */
+        .theme-corner { position: fixed; top: 1rem; right: 1rem; z-index: 10; }
+        .specimen { padding-top: 4rem; }
+    </style>
+    <script defer src="kit/js/lib/globals.js"></script>
+    <script defer src="kit/js/components/sac-theme-toggle.js"></script>
+</head>
+<body>
+    <div class="theme-corner"><sac-theme-toggle></sac-theme-toggle></div>
+
+    <article class="sac-article specimen">
+
+        <p class="sac-kicker">SACRVM · Editorial kit</p>
+        <h1>Newskit</h1>
+        <p class="sac-standfirst">A zero-dependency kit for long-form, source-backed
+        articles — appkit's look, specialised for reading, with sources and
+        provenance as first-class citizens.</p>
+
+        <h2>The demo</h2>
+        <p><a href="demo/project-greek-island.html">Project Greek Island</a> — a
+        complete research file typeset with the kit: masthead, chapter rail,
+        records, inline citations, source chips and the provenance strip.</p>
+
+        <h2>The styleguide</h2>
+        <p><a href="styleguide/reading.html">The reading layer</a> — the prose
+        measure, the type scale and the Oswald display voice.</p>
+        <p><a href="styleguide/primitives.html">The article primitives</a> — every
+        primitive live, including the trust layer.</p>
+
+        <h2>Source</h2>
+        <p>Hand-authored HTML, no build step. The code and the roadmap are on
+        <a href="https://github.com/SACRVM/sacrvm-newskit">GitHub</a>.</p>
+
+    </article>
+</body>
+</html>
