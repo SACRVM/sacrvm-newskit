@@ -22,7 +22,8 @@ it is the source of truth for the look, signed off by the owner.
 ## Build order
 1. **Reading layer** ✅ — `newskit.css` on appkit's tokens: ~40rem prose measure, reading rhythm,
    article type scale, per-scheme AA contrast, self-hosted Oswald. Proves the look in light/dark.
-   Open: in light, the small `--accent-text` labels measure 3.7–4.1:1 (below AA 4.5:1); dark passes.
+   Open: the rail's "Contents" label and inactive chapter numbers use appkit's tertiary `--text-dim`
+   (4.1:1 dark, 2.7:1 light — below appkit's own 3:1 in light). All other text passes AA since appkit 2.12.0.
 2. **Core primitives + trust layer** ✅ — sac-article, sac-masthead, sac-section-head, sac-record,
    sac-sources, sac-cite, sac-provenance, sac-callout, sac-pullquote, sac-figure, sac-colophon, sac-toc.
 3. **The demo article** ✅ — the reference piece re-typeset; end-to-end proof + copy-to-start.
