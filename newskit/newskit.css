@@ -189,7 +189,7 @@ sac-article a:focus-visible, .sac-article a:focus-visible {
 }
 
 sac-article code, .sac-article code {
-    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-family: var(--font-mono);
     font-size: 0.85em;
     background: color-mix(in srgb, var(--fg) 6%, transparent);
     padding: 0.08em 0.38em;
