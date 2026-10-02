@@ -631,7 +631,7 @@ sac-toc .rail-label, .sac-toc .rail-label {
     font-size: 0.7rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: var(--text-muted);   /* AA in both themes; --text-dim fell to 2.7:1 in light */
     margin: 0 0 1.6rem;
 }
 sac-toc ol, .sac-toc ol {
@@ -686,7 +686,7 @@ sac-toc a::before, .sac-toc a::before {
 sac-toc a .n, .sac-toc a .n {
     font-size: 0.7rem;
     font-weight: 700;
-    color: var(--text-dim);
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
     min-width: 1.1rem;
     letter-spacing: 0.03em;
