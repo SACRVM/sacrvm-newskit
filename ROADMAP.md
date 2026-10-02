@@ -27,7 +27,9 @@ it is the source of truth for the look, signed off by the owner.
 2. **Core primitives + trust layer** ✅ — sac-article, sac-masthead, sac-section-head, sac-record,
    sac-sources, sac-cite, sac-provenance, sac-callout, sac-pullquote, sac-figure, sac-colophon, sac-toc.
 3. **The demo article** ✅ — the reference piece re-typeset; end-to-end proof + copy-to-start.
-4. **Styleguide** — every primitive live, appkit-style, with attribute/slot tables.
+4. **Styleguide** ✅ — every primitive live, appkit-style, with attribute/slot tables.
+   Built on appkit's showcase layer (`kit/css/showcase.css`, `sac.showcase`); each specimen
+   renders in a shadow root on `ui.css` + `newskit.css` only (`styleguide/sg-specimen.js`).
 5. **Hub + metadata** — publication index, OG / schema.org Article, reading-time, source counts.
 6. **Release plumbing** — `newskit/VERSION`, the Action (present), CONSUMING.md, the two-kit
    vendoring recipe.

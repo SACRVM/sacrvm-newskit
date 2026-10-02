@@ -2,160 +2,272 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0f1a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#eef2f7" media="(prefers-color-scheme: light)">
     <title>NEWSKIT — Article primitives</title>
+    <!-- A reference page on appkit's showcase layer (the kit style guide's
+         look). The page is showcase.css; every specimen renders in its own
+         shadow root on ui.css + newskit.css only (sg-specimen.js). -->
     <link rel="stylesheet" href="../kit/css/ui.css">
+    <link rel="stylesheet" href="../kit/css/showcase.css">
     <link rel="stylesheet" href="../newskit/newskit.css">
-    <style>
-        /* Page chrome only — the whole specimen below is kit CSS. */
-        .theme-corner { position: fixed; top: 1rem; right: 1rem; z-index: 10; }
-    </style>
+
     <script defer src="../kit/js/lib/globals.js"></script>
+    <script defer src="../kit/js/i18n/de.js"></script>
+    <script defer src="../kit/js/lib/icons.js"></script>
+    <script defer src="../kit/js/lib/router.js"></script>
+    <script defer src="../kit/js/lib/showcase.js"></script>
+    <script defer src="../kit/js/components/sac-icon.js"></script>
+    <script defer src="../kit/js/components/sac-nav.js"></script>
     <script defer src="../kit/js/components/sac-theme-toggle.js"></script>
+    <script defer src="../kit/js/components/sac-lang-toggle.js"></script>
     <script defer src="../newskit/js/components/sac-section-head.js"></script>
     <script defer src="../newskit/js/components/sac-cite.js"></script>
     <script defer src="../newskit/js/components/sac-sources.js"></script>
     <script defer src="../newskit/js/components/sac-provenance.js"></script>
-    <script defer src="../newskit/js/components/sac-toc.js"></script>
+    <script defer src="sg-specimen.js"></script>
+    <script defer src="sg-nav.js"></script>
 </head>
-<body>
-    <div class="theme-corner"><sac-theme-toggle></sac-theme-toggle></div>
+<body class="app-page">
+    <sac-nav brand="NEWSKIT" brand-icon="document"
+             brand-href="https://sacrvm.github.io/sacrvm-appkit/#/styleguide/addons">
+        <div slot="context">
+            <sac-lang-toggle></sac-lang-toggle>
+            <sac-theme-toggle></sac-theme-toggle>
+        </div>
+    </sac-nav>
 
-    <div class="news-shell">
-
-        <sac-toc brand="Newskit"></sac-toc>
-
-        <sac-article>
-
-            <sac-masthead>
-                <p class="kicker">Newskit styleguide · Phase 2 · Every primitive, live</p>
-                <h1>The article primitives</h1>
-                <p class="standfirst">Masthead, section heads, records, and the trust
-                layer — cite markers, source chips, the provenance strip, the method
-                callout. Everything on this page is a kit primitive; the rail on the
-                left is one too.</p>
-                <div class="meta">
-                    <span>Phase 2 specimen</span>
-                    <span>Hand-authored HTML</span>
-                    <span>Zero build</span>
-                </div>
-            </sac-masthead>
-
-            <sac-provenance researched="2026-08-28" method="extracted from the approved template"
-                            sources="3" claims="2"></sac-provenance>
-
-            <sac-callout kind="method">
-                <p><span class="label">Method / disclosure</span>The warm signature marks
-                how a piece was made — distinct from an ordinary aside, so the trust
-                anchor is learnable at a glance. This is where a researched article
-                states its process, model and limits. The strip above it renders from
-                four attributes on <code>sac-provenance</code>.</p>
-            </sac-callout>
-
-            <sac-section-head marker="Part 01|The head">
-                <h2>Masthead &amp; provenance</h2>
-                <p class="note">The article head is hand-written children — kicker, H1,
-                standfirst, meta dateline — inside one element that draws the 2px
-                neutral rule.</p>
-            </sac-section-head>
-
-            <p>The masthead above is the strongest single news signal on the page:
-            the condensed uppercase display title over a flat <strong>neutral</strong>
-            2px rule — deliberately not a colored stripe, because we stay in appkit's
-            rounded world. The dateline dots take the accent; the rule does not.</p>
-
-            <sac-section-head marker="Part 02|The spine">
-                <h2>Records &amp; the trust layer</h2>
-                <p class="note">A structured entry whose every claim resolves to a
-                source — the credibility spine, rendered.</p>
-            </sac-section-head>
-
-            <sac-record>
-                <h3>A standby facility existed for decades</h3>
-                <p class="origin">Documented record · declassified</p>
-                <p>A complete relocation facility operated beneath a civilian site for
-                thirty years<sac-cite href="#s1">1</sac-cite>, sustained by a front
-                company doing genuine work as cover<sac-cite href="#s2">2</sac-cite>.
-                It was ended not by a leak but by ordinary reporting — records, local
-                knowledge, interviews<sac-cite href="#s3">3</sac-cite>.</p>
-                <div class="highlight">
-                    <p><span class="label">Why it anchors the claim</span>Every element
-                    a weaker narrative would only assert is here as fact — and it was
-                    <em>found</em>, which is what a documented record looks like. The
-                    evidence sits one tap away, below.</p>
-                </div>
-                <sac-sources>
-                    <a id="s1" href="#s1">example.org · 1992</a>
-                    <a id="s2" href="#s2">archive.example · 2017</a>
-                    <a id="s3" href="#s3">press.example · 1992</a>
-                </sac-sources>
-            </sac-record>
-
-            <sac-record warm>
-                <h3>A warm record</h3>
-                <p class="origin">Attention state · unresolved</p>
-                <p><span class="label">Open question</span>The <code>warm</code>
-                attribute shifts a record's eyebrows — origin and labels — to the warm
-                state ink for entries that need attention. The surface itself stays
-                neutral; state never becomes a border.</p>
-            </sac-record>
-
-            <sac-pullquote>Trust reads as structure, not decoration</sac-pullquote>
-
-            <p>Between the tiles, analytical prose sits on bare ground — one display
-            moment per viewport, so the middle of an article never reads as a
-            settings screen. The pullquote above carries the display voice at
-            paragraph scale; the cite markers in the record resolve to the chip list
-            at its foot — try one<a class="sac-cite" href="#s1">1</a>, this one is
-            the hand-authored <code>&lt;a class="sac-cite"&gt;</code> fallback.</p>
-
-            <sac-section-head marker="Part 03|The rest">
-                <h2>Figure, callout, colophon</h2>
-                <p class="note">The quieter furniture — media with credit, the plain
-                aside, and the provenance footer.</p>
-            </sac-section-head>
-
-            <sac-figure>
-                <svg viewBox="0 0 640 240" role="img" aria-label="Placeholder diagram"
-                     style="width:100%;height:auto;display:block;border-radius:6px;background:color-mix(in srgb,var(--fg) 5%,transparent)">
-                    <g fill="none" stroke="var(--accent)" stroke-width="2">
-                        <rect x="40" y="40" width="240" height="160" rx="6" opacity=".7"/>
-                        <line x1="320" y1="70" x2="600" y2="70" opacity=".5"/>
-                        <line x1="320" y1="110" x2="560" y2="110" opacity=".35"/>
-                        <line x1="320" y1="150" x2="580" y2="150" opacity=".35"/>
-                        <line x1="320" y1="190" x2="520" y2="190" opacity=".2"/>
-                    </g>
-                </svg>
-                <figcaption>A figure carries its caption in reading ink one step down,
-                and its credit in the label voice. <span class="credit">Credit ·
-                Newskit specimen</span></figcaption>
-            </sac-figure>
-
-            <sac-callout>
-                <p><span class="label">Plain aside</span>The unmarked callout keeps the
-                cool accent tint. Only <code>kind="method"</code> and
-                <code>kind="disclosure"</code> take the warm signature — the
-                distinction is the point.</p>
-            </sac-callout>
-
-            <sac-section-head>A bare-text section head</sac-section-head>
-
-            <p>The head above was written as
-            <code>&lt;sac-section-head&gt;text&lt;/sac-section-head&gt;</code> — the
-            component wraps bare text into the H2, and the rail on the left picked it
-            up as chapter 04 with a slugged anchor. No marker, no note: both are
-            optional.</p>
-
-            <sac-colophon>
-                Newskit — article primitives specimen · Phase 2 · built with the kit it
-                proves<br>
-                Every block above: sac-masthead · sac-provenance · sac-callout ·
-                sac-section-head · sac-record · sac-cite · sac-sources ·
-                sac-pullquote · sac-figure · sac-toc · sac-colophon
-            </sac-colophon>
-
-        </sac-article>
-
+    <div class="main-layout">
+        <div class="app-scroll">
+            <div class="sg-page" id="page"></div>
+        </div>
     </div>
+
+    <script defer>
+        document.addEventListener("DOMContentLoaded", () => {
+            const { code, table, compact, note } = sac.showcase;
+            const page = document.getElementById("page");
+            page.innerHTML = `
+                <h1>The article primitives</h1>
+                <p class="lead">The building blocks of a researched article: masthead,
+                   section heads, records — and the trust layer that makes sources and
+                   provenance first-class: cite markers, source chips, the provenance
+                   strip, the method callout. Needs SACRVM APPKIT 2.24.0 or newer.</p>
+
+                <h2 id="use">Use</h2>
+                <p>Every primitive is styled in the light DOM by <code>newskit.css</code>
+                   (element selector and class fallback, identical treatment), so
+                   hand-authored HTML looks right with no script at all. The scripts in
+                   <code>newskit/js/components/</code> only add behaviour and structure
+                   sugar; load the ones a page uses.</p>
+                ${code(`<script defer src="kit/js/lib/globals.js"><\/script>
+<script defer src="newskit/js/components/sac-section-head.js"><\/script>
+<script defer src="newskit/js/components/sac-cite.js"><\/script>
+<script defer src="newskit/js/components/sac-sources.js"><\/script>
+<script defer src="newskit/js/components/sac-provenance.js"><\/script>
+<script defer src="newskit/js/components/sac-toc.js"><\/script>`)}
+                ${note("<b>Design rule:</b> no primitive ever takes a thick (2px or more) coloured border on a rounded surface. Accent lives in eyebrow ink and a soft tint, never in a stripe. The masthead's 2px rule is the one thick line, and it is neutral.")}
+
+                <h2 id="masthead">sac-masthead</h2>
+                <p>The article head: kicker, display title, standfirst and a dateline over
+                   a flat neutral 2px rule — the strongest single news signal on the page.
+                   CSS only; the children are hand-written.</p>
+                ${sg.demo(`
+                    <sac-masthead>
+                        <p class="kicker">Research file · Cold War · Declassified</p>
+                        <h1>Project Greek Island</h1>
+                        <p class="standfirst">A standby capitol under a luxury resort,
+                        undone not by a spy but by a newspaper.</p>
+                        <div class="meta">
+                            <span>White Sulphur Springs, WV</span>
+                            <span>1958 – 1995</span>
+                        </div>
+                    </sac-masthead>`)}
+                ${table("Child", [
+                    ["p.kicker", "The accent eyebrow (Outfit 700, uppercase)."],
+                    ["h1", "The headline in the display voice (Oswald 600, uppercase)."],
+                    ["p.standfirst", "The summary, a quiet step below the body."],
+                    ["div.meta > span", "The dateline; each span gets an accent dot."],
+                ])}
+
+                <h2 id="provenance">sac-provenance</h2>
+                <p>The under-title strip: when and how the piece was made, at a glance.
+                   Renders one labelled span per present attribute, in fixed order.</p>
+                ${sg.demo(`
+                    <sac-provenance researched="2026-08-28" method="multi-source review"
+                                    sources="5" claims="13"></sac-provenance>`)}
+                ${table("Attribute", [
+                    ["researched", "The date the research was done."],
+                    ["method", "How, e.g. <code>multi-source review</code>."],
+                    ["sources", "The source count."],
+                    ["claims", "The claim count."],
+                ])}
+                <p>All attributes are optional; labels are localised through
+                   <code>sac.t</code> when the kit globals are loaded. Without the script,
+                   write the spans yourself inside <code>&lt;div class="sac-provenance"&gt;</code>:
+                   <code>&lt;span&gt;&lt;b&gt;Researched&lt;/b&gt; 2026-08-28&lt;/span&gt;</code>.</p>
+
+                <h2 id="callout">sac-callout</h2>
+                <p>The aside. <code>kind="method"</code> and <code>kind="disclosure"</code>
+                   take the warm trust-anchor signature — where a researched piece states
+                   its process, model and limits. The unmarked callout keeps the cool
+                   accent tint; the distinction is the point.</p>
+                ${sg.demo(`
+                    <sac-callout kind="method">
+                        <p><span class="label">Method / disclosure</span>Compiled from the
+                        public record: the original reporting, the site's own declassified
+                        account and three secondary histories.</p>
+                    </sac-callout>
+                    <sac-callout>
+                        <p><span class="label">Plain aside</span>Context worth having,
+                        but not a statement about how the piece was made.</p>
+                    </sac-callout>`)}
+                ${table("Attribute", [
+                    ["kind", "<code>method</code> | <code>disclosure</code> — the warm signature. Absent = the plain, cool aside. Class fallback: <code>.sac-callout.method</code> / <code>.disclosure</code>."],
+                ])}
+                ${table("Child", [
+                    ["span.label", "The eyebrow at the start of a paragraph (block, Outfit 700)."],
+                ])}
+
+                <h2 id="section-head">sac-section-head</h2>
+                <p>Accent marker, H2 and a one-line note — and the chapter anchor
+                   <code>sac-toc</code> scans for. The marker sits in a 5rem left column.</p>
+                ${sg.demo(`
+                    <sac-section-head marker="Part 01|The build">
+                        <h2>A hotel wing with a basement</h2>
+                        <p class="note">The cover story was poured in concrete first.</p>
+                    </sac-section-head>
+                    <sac-section-head>A bare-text section head</sac-section-head>`)}
+                ${table("Attribute", [
+                    ["marker", "The left-column eyebrow; <code>|</code> breaks the line (<code>Part 01|The build</code> → two lines). A hand-written <code>p.marker</code> wins."],
+                    ["id", "The chapter anchor. <code>sac-toc</code> assigns a slug from the title when it is absent."],
+                ])}
+                ${table("Child", [
+                    ["h2", "The section title. Bare text content is wrapped into an h2 for you."],
+                    ["p.note", "The one-line dek under the title (optional)."],
+                ])}
+                ${compact("under 38rem the marker stacks above the title instead of sitting beside it.")}
+
+                <h2 id="record">sac-record</h2>
+                <p>The structured entry — the credibility spine, rendered. An appkit tile
+                   surface with a hairline; accent lives in the eyebrows and the soft-tint
+                   highlight. Every claim resolves to a source chip at its foot.</p>
+                ${sg.demo(`
+                    <sac-record>
+                        <h3>A standby facility existed for decades</h3>
+                        <p class="origin">Documented record · declassified</p>
+                        <p>A relocation facility operated beneath a civilian site for
+                        thirty years<sac-cite href="#s1">1</sac-cite>, with a front
+                        company doing genuine work as cover<sac-cite href="#s2">2</sac-cite>.</p>
+                        <div class="highlight">
+                            <p><span class="label">Why it anchors the claim</span>It was
+                            found, not asserted — which is what a documented record looks like.</p>
+                        </div>
+                        <sac-sources>
+                            <a id="s1" href="#s1">example.org · 1992</a>
+                            <a id="s2" href="#s2">archive.example · 2017</a>
+                        </sac-sources>
+                    </sac-record>
+                    <sac-record warm>
+                        <h3>A warm record</h3>
+                        <p class="origin">Attention state · unresolved</p>
+                        <p><span class="label">Open question</span>The eyebrows shift to the
+                        warm ink; the surface stays neutral.</p>
+                    </sac-record>`)}
+                ${table("Attribute", [
+                    ["warm", "Shifts the eyebrows (origin and labels) to the warm state ink for entries that need attention. The surface never changes. Class fallback: <code>.sac-record.warm</code>."],
+                ])}
+                ${table("Child", [
+                    ["h3", "The entry title (Oswald 500)."],
+                    ["p.origin", "Where the facts come from — the entry's dateline."],
+                    ["span.label", "An accent eyebrow above a labelled statement."],
+                    ["div.highlight", "The analysis block on the soft accent tint."],
+                    ["sac-sources", "The record's sources, last."],
+                ])}
+
+                <h2 id="cite">sac-cite</h2>
+                <p>The inline citation marker: a claim carries its evidence. Renders an
+                   anchor to the record's source chip.</p>
+                ${sg.demo(`
+                    <p>A claim with its evidence<sac-cite href="#s1">1</sac-cite>, and the
+                    hand-written fallback<a class="sac-cite" href="#s1">2</a>.</p>`)}
+                ${table("Attribute", [
+                    ["href", "The citation target, usually the <code>#id</code> of a source chip."],
+                ])}
+                <p>Fallback without script: <code>&lt;a class="sac-cite" href="#s1"&gt;1&lt;/a&gt;</code>
+                   — identical look. A hand-written <code>&lt;a&gt;</code> inside the element is kept.</p>
+
+                <h2 id="sources">sac-sources</h2>
+                <p>The sources as scannable chips (domain · date), not a dim run of links.
+                   The script prepends the <b>Sources</b> label when the author didn't write one.</p>
+                ${sg.demo(`
+                    <sac-sources>
+                        <a id="s1" href="#s1">example.org · 1992</a>
+                        <a id="s2" href="#s2">archive.example · 2017</a>
+                        <a id="s3" href="#s3">press.example · 1992</a>
+                    </sac-sources>`)}
+                ${table("Child", [
+                    ["a", "One chip per source; give it the <code>id</code> the cite markers point to."],
+                    ["span.label", "Optional own label; otherwise “Sources” (localised through <code>sac.t</code>)."],
+                ])}
+
+                <h2 id="pullquote">sac-pullquote</h2>
+                <p>The display-weight emphasis line: one display moment between stretches
+                   of prose. A plain <code>blockquote</code> is the quiet quotation; this is
+                   the loud one. CSS only.</p>
+                ${sg.demo(`
+                    <sac-pullquote>Trust reads as structure, not decoration</sac-pullquote>`)}
+
+                <h2 id="figure">sac-figure</h2>
+                <p>Media with a caption in reading ink one step down and a credit in the
+                   label voice. CSS only; <code>figure.sac-figure</code> is the fallback.</p>
+                ${sg.demo(`
+                    <sac-figure>
+                        <svg viewBox="0 0 640 200" role="img" aria-label="Placeholder diagram"
+                             style="width:100%;height:auto;display:block;border-radius:6px;background:color-mix(in srgb,var(--fg) 5%,transparent)">
+                            <rect x="40" y="40" width="200" height="120" rx="6" fill="none" stroke="var(--accent)" stroke-width="2" opacity=".7"/>
+                        </svg>
+                        <figcaption>The caption explains the figure.
+                        <span class="credit">Credit · Newskit specimen</span></figcaption>
+                    </sac-figure>`)}
+                ${table("Child", [
+                    ["img / svg / video", "The media."],
+                    ["figcaption", "The caption (or <code>.caption</code>)."],
+                    ["span.credit", "The credit, in the label voice."],
+                ])}
+
+                <h2 id="colophon">sac-colophon</h2>
+                <p>The provenance footer at the end of an article: date, method, licence.
+                   CSS only.</p>
+                ${sg.demo(`
+                    <sac-colophon>
+                        Researched 2026-08-28 · multi-source review · built with newskit
+                    </sac-colophon>`)}
+
+                <h2 id="toc">sac-toc</h2>
+                <p>The persistent left chapter rail. Inside a <code>.news-shell</code> grid
+                   it lists the article's section heads as a numbered rail and tracks the
+                   reading position: done chapters fill, the current one lights up. It
+                   needs a whole page to scroll, so see it live in the
+                   <a href="../demo/project-greek-island.html">demo article</a>.</p>
+                ${code(`<div class="news-shell">
+    <sac-toc brand="Dispatch"></sac-toc>
+    <sac-article>
+        …sac-section-head chapters…
+    </sac-article>
+</div>`)}
+                ${table("Attribute", [
+                    ["brand", "The display-face brand line above the rail (optional)."],
+                    ["label", "The rail heading; default “Contents” (localised through <code>sac.t</code>)."],
+                    ["for", "CSS selector for the chapter targets; default <code>sac-section-head, .sac-section-head</code>."],
+                ])}
+                ${table("Method", [
+                    ["refresh()", "Re-scan and rebuild, for a page assembled after load."],
+                ])}
+                ${compact("under 60rem the rail hides and the shell collapses to one column.")}`;
+            sac.showcase.watchCode(page);
+        });
+    </script>
 </body>
 </html>
