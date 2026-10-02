@@ -11,6 +11,9 @@
         "about.this-app": "Diese App",
         "about.title": "Über {name}",
 
+        "apps.changed": "wurde seit der Installation verändert — aktualisieren oder entfernen.",
+        "apps.load-failed": "konnte nicht geladen werden.",
+
         "calendar.next-decade": "10 Jahre vor",
         "calendar.next-month": "Nächster Monat",
         "calendar.next-year": "Nächstes Jahr",
@@ -104,6 +107,8 @@
         "files.save": "Speichern",
         "files.save-title": "Speichern unter",
         "files.saving": "Speichern…",
+        "files.select-done": "Fertig",
+        "files.selected-count": "{n} ausgewählt",
         "files.sort-by": "Nach {column} sortieren",
         "files.to-device": "Stattdessen auf diesem Gerät speichern…",
         "files.type-file": "Datei",
@@ -168,6 +173,11 @@
         "launcher.placeholder-width": "500px",
         "launcher.remove": "{name} entfernen",
         "launcher.show": "{name} einblenden",
+        "launcher.size-large": "Große Kachel",
+        "launcher.size-medium": "Mittlere Kachel",
+        "launcher.size-small": "Kleine Kachel",
+        "launcher.size-wide": "Breite Kachel",
+        "launcher.tile-menu": "Aktionen für {name}",
 
         "layer-list.add": "Ebene hinzufügen",
         "layer-list.delete": "Ebene löschen",
@@ -198,12 +208,17 @@
         "nav.more": "Mehr",
         "nav.no-sections": "Noch keine Bereiche.",
 
+        "number-field.number": "Zahl",
+
         "palette.commands": "Befehle",
         "palette.empty": "Keine passenden Befehle",
         "palette.group-apps": "Apps",
+        "palette.group-results": "Ergebnisse",
         "palette.group-views": "Ansichten",
         "palette.placeholder": "Befehl eingeben…",
         "palette.search": "Befehle durchsuchen",
+        "palette.searching": "Suche läuft…",
+        "palette.source-error": "Ergebnisse konnten nicht geladen werden",
         "palette.title": "Befehlspalette",
 
         "pixel-canvas.label": "Pixel-Leinwand",
@@ -228,6 +243,11 @@
         "scene.expand": "Auf- / zuklappen",
         "scene.unnamed": "Unbenannt",
         "scene.visibility": "Sichtbarkeit umschalten",
+
+        "select.clear": "Leeren",
+        "select.no-matches": "Keine Treffer",
+        "select.options": "Optionen",
+        "select.placeholder": "Auswählen …",
 
         "shortcutbar.label": "Tastenkürzel",
 
