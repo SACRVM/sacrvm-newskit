@@ -120,7 +120,17 @@ sac-article, .sac-article {
    5. The article type scale — the condensed UPPERCASE display treatment is
    the news signature; everything else stays appkit.
    h1 display · h2 section · h3 entry · h4 subhead.
+   One long word (a German compound, "DECOMMISSIONING") is wider than a
+   phone at display size: hyphenate by the page's lang, and break the word
+   rather than push the page sideways. `anywhere`, not `break-word`: only
+   `anywhere` lowers the min-content width, and the auto-margined article
+   in the one-column shell sizes to it.
    -------------------------------------------------------------------------- */
+sac-article :is(h1, h2, h3, h4), .sac-article :is(h1, h2, h3, h4),
+sac-pullquote, .sac-pullquote {
+    overflow-wrap: anywhere;
+    hyphens: auto;
+}
 sac-article h1, .sac-article h1 {
     font-family: var(--display-font);
     font-weight: 600;
@@ -330,6 +340,9 @@ sac-section-head > .marker, .sac-section-head > .marker {
     border-top: 1px solid var(--accent);
 }
 sac-section-head h2, .sac-section-head h2 { margin: 0 0 0.4rem; }
+/* A chapter jump focuses the heading (tabindex -1) so the next Tab goes on
+   inside the chapter; the view already moved there, so no ring. */
+sac-section-head [tabindex="-1"]:focus, .sac-section-head [tabindex="-1"]:focus { outline: none; }
 sac-section-head .note, .sac-section-head .note {
     font-size: 1rem;
     color: var(--text-muted);
@@ -406,12 +419,17 @@ sac-record .highlight p, .sac-record .highlight p { font-size: 0.94rem; }
 
 /* --------------------------------------------------------------------------
    11. sac-cite — the inline citation marker: a claim carries its evidence.
-   sac-cite.js wraps the marker text in an <a href>; hand-authored form is
-   <a class="sac-cite" href="#s1">1</a>. 0.66em keeps the marker at the
-   0.7rem floor against the 17px reading size.
+   sac-cite.js wraps the marker text in an <a href> and names it after its
+   chip; hand-authored form is <a class="sac-cite" href="#s1">1</a>. 0.66em
+   keeps the marker at the 0.7rem floor against the 17px reading size.
+   The visible badge is ~10×14px; a transparent ::after widens the hit area
+   past 24×24px without changing the look. scroll-margin-top: arriving back
+   from a source ("Back to text") puts the marker in the upper third, with
+   the lines before it still in view.
    -------------------------------------------------------------------------- */
 sac-cite { display: inline; }
 sac-cite a, a.sac-cite {
+    position: relative;
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
     font-size: 0.66em;
@@ -423,13 +441,30 @@ sac-cite a, a.sac-cite {
     padding: 0.15em 0.32em;
     margin-left: 0.12em;
     text-decoration: none;
+    scroll-margin-top: 30vh;
+    transition: background-color 0.15s;
 }
-sac-cite a:hover, a.sac-cite:hover { background: var(--accent-tint); }
+sac-cite a::after, a.sac-cite::after {
+    content: "";
+    position: absolute;
+    inset: -12px -8px;
+}
+sac-cite a:hover, a.sac-cite:hover,
+sac-cite a:target, a.sac-cite:target { background: var(--accent-tint); }
+sac-cite a:active, a.sac-cite:active {
+    background: color-mix(in srgb, var(--accent) 26%, transparent);
+    transition-duration: 0.1s;
+}
 
 /* --------------------------------------------------------------------------
    12. sac-sources — the credibility spine: scannable chips (domain · date),
    not a dim link run. sac-sources.js prepends the "Sources" label when the
    author didn't write one.
+   Each chip shows its number — the number the record's cite markers carry
+   (CSS counter, so hand-written chips number themselves too). The chip a
+   cite led to is the :target: it lights up in the accent, lands in the
+   upper third of the view (the claim above it stays visible), and shows
+   the "Back to text" link sac-cite.js puts after it.
    -------------------------------------------------------------------------- */
 sac-sources, .sac-sources {
     margin: 0.95rem 0 0;
@@ -439,6 +474,7 @@ sac-sources, .sac-sources {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.4rem;
+    counter-reset: sac-source;
 }
 sac-sources .label, .sac-sources .label {
     font-family: 'Outfit', sans-serif;
@@ -459,11 +495,52 @@ sac-sources a, .sac-sources a {
     padding: 0.22rem 0.55rem;
     color: var(--text-muted);
     text-decoration: none;
+    counter-increment: sac-source;
+    scroll-margin-top: 30vh;
+    transition: border-color 0.15s, color 0.15s, background-color 0.15s,
+                box-shadow 0.15s, transform 0.2s var(--ease-smooth);
+}
+sac-sources a::before, .sac-sources a::before {
+    content: counter(sac-source) " ";
+    font-weight: 700;
+    color: var(--accent-text);
+    margin-right: 0.15rem;
 }
 sac-sources a:hover, .sac-sources a:hover {
     border-color: var(--border-strong);
     color: var(--accent-text);
 }
+sac-sources a:target, .sac-sources a:target {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    color: var(--accent-text);
+}
+sac-sources a:active, .sac-sources a:active {
+    transform: scale(0.97);
+    transition-duration: 0.1s;
+}
+/* The way back from a source — only on the chip the reader arrived at. */
+sac-sources a.sac-back, .sac-sources a.sac-back {
+    display: none;
+    counter-increment: none;
+    background: none;
+    border-color: transparent;
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+sac-sources a.sac-back::before, .sac-sources a.sac-back::before {
+    content: "↩ ";
+    content: "↩ " / "";
+    font-weight: 600;
+}
+sac-sources a.sac-back:hover, .sac-sources a.sac-back:hover {
+    border-color: transparent;
+    text-decoration-color: var(--accent);
+}
+sac-sources a:target + a.sac-back, .sac-sources a:target + a.sac-back { display: inline-block; }
 
 /* --------------------------------------------------------------------------
    13. sac-provenance — the under-title strip: researched date · method ·
@@ -600,8 +677,9 @@ sac-colophon, .sac-colophon {
 /* padding-top puts the brand wordmark's CAP TOP on the masthead H1's
    cap top — the two text top edges sit flush on one horizontal line
    (owner call, 2026-08-28). The offset is solvable statically because
-   the H1's clamp is always at its 6.5rem maximum wherever the rail is
-   visible (≥60rem); it assumes the canonical masthead (4rem top
+   the H1's clamp is always at its 6.5rem maximum wherever the rail sits
+   beside the article (≥60rem; below, it is the Contents block with its
+   own padding); it assumes the canonical masthead (4rem top
    padding, one-line kicker). Measured in-browser via canvas glyph
    metrics, not derived from font tables. Once stuck, the padding is
    breathing room. */
@@ -693,6 +771,11 @@ sac-toc a .n, .sac-toc a .n {
     transition: color 0.15s;
 }
 sac-toc a:hover, .sac-toc a:hover { color: var(--text); }
+sac-toc a:active, .sac-toc a:active { background: var(--hover-strong); }
+sac-toc a:focus-visible, .sac-toc a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
 sac-toc a:hover::before, .sac-toc a:hover::before { border-color: var(--text-muted); }
 sac-toc a.done, .sac-toc a.done { color: var(--text-muted); }
 sac-toc a.done::before, .sac-toc a.done::before {
@@ -706,9 +789,53 @@ sac-toc a.active::before, .sac-toc a.active::before {
     box-shadow: 0 0 0 3px var(--accent-soft);
 }
 sac-toc a.active .n, .sac-toc a.active .n { color: var(--accent-text); }
+/* The compact-layout switch (sac-toc.js renders it; an appkit .btn). Beside
+   the article the rail is always open, so the button only exists below. */
+sac-toc .toc-toggle, .sac-toc .toc-toggle {
+    display: none;
+    justify-content: space-between;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+sac-toc .toc-toggle::after, .sac-toc .toc-toggle::after {
+    content: "";
+    width: 0.45rem;
+    height: 0.45rem;
+    margin: -0.2rem 0.2rem 0 0;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s var(--ease-smooth);
+}
+sac-toc .toc-toggle[aria-expanded="true"]::after,
+.sac-toc .toc-toggle[aria-expanded="true"]::after {
+    margin-top: 0.25rem;
+    transform: rotate(-135deg);
+}
+/* Under 60rem (phones, and desktops with a large default font) the shell
+   is one column and the rail becomes a Contents block above the article:
+   the same list, behind the toggle. A hand-written nav.sac-toc without the
+   toggle keeps its list open. */
 @media (max-width: 60rem) {
     .news-shell { grid-template-columns: 1fr; }
-    sac-toc, .sac-toc { display: none; }
+    sac-toc, .sac-toc {
+        position: static;
+        height: auto;
+        overflow: visible;
+        width: 100%;
+        max-width: 52rem;
+        margin-inline: auto;
+        padding: 1.25rem 1.5rem 0;
+        border-right: none;
+    }
+    sac-toc .brand, .sac-toc .brand { margin-bottom: 1rem; }
+    sac-toc:has(> .toc-toggle) > .rail-label,
+    .sac-toc:has(> .toc-toggle) > .rail-label { display: none; }
+    sac-toc .toc-toggle, .sac-toc .toc-toggle { display: flex; }
+    sac-toc .toc-toggle[aria-expanded="false"] + ol,
+    .sac-toc .toc-toggle[aria-expanded="false"] + ol { display: none; }
+    sac-toc .toc-toggle + ol, .sac-toc .toc-toggle + ol { margin-top: 0.8rem; }
     .news-shell > sac-article, .news-shell > .sac-article {
         margin-inline: auto;
         padding: 0 1.5rem 6rem;

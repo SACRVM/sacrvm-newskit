@@ -115,7 +115,7 @@
                 ${table("Font", [
                     ["Oswald 500 / 600", "Self-hosted (OFL 1.1), latin + latin-ext subsets in <code>newskit/fonts/</code>. Only these two weights exist; no CDN."],
                 ])}
-                ${compact("under 38rem the reading size steps from 17px down to 16px; the measure and the scale stay.")}
+                ${compact("under 38rem the reading size steps from 17px down to 16px; the measure and the scale stay. A word wider than the phone in a display headline (a German compound, “DECOMMISSIONING”) is hyphenated by the page's <code>lang</code> and otherwise broken, never pushed past the edge. Set <code>lang</code> on <code>&lt;html&gt;</code>.")}
                 ${note("<b>Note:</b> newskit consumes appkit's tokens directly, so a retheme of appkit rethemes every article. Keep <code>kit/</code> on the appkit version newskit targets.")}`;
             sac.showcase.watchCode(page);
         });

@@ -94,16 +94,22 @@
 
                 <h2 id="provenance">sac-provenance</h2>
                 <p>The under-title strip: when and how the piece was made, at a glance.
-                   Renders one labelled span per present attribute, in fixed order.</p>
+                   Renders one labelled span per present attribute, in fixed order. The
+                   two counts are counted, not typed: inside an article that carries cite
+                   markers, the strip shows what the article actually cites, so the numbers
+                   cannot drift when a claim or a source is added.</p>
                 ${sg.demo(`
                     <sac-provenance researched="2026-08-28" method="multi-source review"
                                     sources="5" claims="13"></sac-provenance>`)}
                 ${table("Attribute", [
                     ["researched", "The date the research was done."],
                     ["method", "How, e.g. <code>multi-source review</code>."],
-                    ["sources", "The source count."],
-                    ["claims", "The claim count."],
+                    ["sources", "Shows the source count: the distinct source URLs among the article's chips. Write it empty (<code>sources</code>) to just ask for the count; a number is the fallback when there is nothing to count, as in this specimen."],
+                    ["claims", "Shows the claim count: the article's <code>sac-cite</code> markers, where markers right next to each other count as one claim. Empty or a fallback number, as above."],
                 ])}
+                <p>The article counted is the enclosing <code>sac-article</code>. When it has
+                   cite markers and a typed number disagrees, the count wins and the console
+                   warns, so a stale number gets noticed.</p>
                 <p>All attributes are optional; labels are localised through
                    <code>sac.t</code> when the kit globals are loaded. Without the script,
                    write the spans yourself inside <code>&lt;div class="sac-provenance"&gt;</code>:
@@ -189,7 +195,9 @@
 
                 <h2 id="cite">sac-cite</h2>
                 <p>The inline citation marker: a claim carries its evidence. Renders an
-                   anchor to the record's source chip.</p>
+                   anchor to the record's source chip, named after that chip, so a screen
+                   reader says “Source 1: example.org, 1992” instead of “1”. The badge stays
+                   small; its hit area is widened past 24×24px.</p>
                 ${sg.demo(`
                     <p>A claim with its evidence<sac-cite href="#s1">1</sac-cite>, and the
                     hand-written fallback<a class="sac-cite" href="#s1">2</a>.</p>`)}
@@ -197,11 +205,23 @@
                     ["href", "The citation target, usually the <code>#id</code> of a source chip."],
                 ])}
                 <p>Fallback without script: <code>&lt;a class="sac-cite" href="#s1"&gt;1&lt;/a&gt;</code>
-                   — identical look. A hand-written <code>&lt;a&gt;</code> inside the element is kept.</p>
+                   — identical look, named by its number only. A hand-written <code>&lt;a&gt;</code>
+                   inside the element keeps its text and href and still gets the name.</p>
+                <p><b>The way back.</b> The script gives every marker an id
+                   (<code>cite-&lt;chip id&gt;-&lt;n&gt;</code>) and puts a “Back to text” link after
+                   the chip it points at. That link shows only while the chip is the page's
+                   <code>:target</code>, and it returns to the marker the reader followed. Without
+                   the script the browser's Back button does the same. The marker's number must
+                   be the chip's position in its <code>sac-sources</code>; the console warns
+                   when it is not.</p>
 
                 <h2 id="sources">sac-sources</h2>
                 <p>The sources as scannable chips (domain · date), not a dim run of links.
-                   The script prepends the <b>Sources</b> label when the author didn't write one.</p>
+                   Each chip shows its number, the number the record's cite markers carry
+                   (pure CSS, so hand-written chips number themselves too). The chip a cite
+                   led to lights up and lands in the upper third of the view, with the claim
+                   above it still visible. The script prepends the <b>Sources</b> label when
+                   the author didn't write one.</p>
                 ${sg.demo(`
                     <sac-sources>
                         <a id="s1" href="#s1">example.org · 1992</a>
@@ -249,8 +269,12 @@
                 <h2 id="toc">sac-toc</h2>
                 <p>The persistent left chapter rail. Inside a <code>.news-shell</code> grid
                    it lists the article's section heads as a numbered rail and tracks the
-                   reading position: done chapters fill, the current one lights up. It
-                   needs a whole page to scroll, so see it live in the
+                   reading position: done chapters fill, the current one lights up and
+                   carries <code>aria-current="location"</code>. The rail is a navigation
+                   landmark named after its label. A chapter jump moves focus to the
+                   chapter's heading, so the next Tab continues there, and adds a history
+                   entry, so Back returns to where the reader was. It needs a whole page to
+                   scroll, so see it live in the
                    <a href="../demo/project-greek-island.html">demo article</a>.</p>
                 ${code(`<div class="news-shell">
     <sac-toc brand="Dispatch"></sac-toc>
@@ -266,7 +290,7 @@
                 ${table("Method", [
                     ["refresh()", "Re-scan and rebuild, for a page assembled after load."],
                 ])}
-                ${compact("under 60rem the rail hides and the shell collapses to one column.")}`;
+                ${compact("under 60rem (phones, and desktops with a large default font) the shell collapses to one column and the same list sits above the article behind a Contents button, collapsed by default. A hand-written <code>nav.sac-toc</code> keeps its list open.")}`;
             sac.showcase.watchCode(page);
         });
     </script>

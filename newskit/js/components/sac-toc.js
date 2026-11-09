@@ -4,21 +4,25 @@
  * The persistent left chapter rail: always visible beside the article
  * (inside a .news-shell grid), it lists the chapters as a numbered rail
  * and tracks the reading position — done chapters fill, the current one
- * lights up. Hidden under 60rem (the shell collapses to one column).
+ * lights up and carries aria-current="location". Under 60rem the shell
+ * collapses to one column and the same list sits above the article behind
+ * a "Contents" button (collapsed by default).
  *
  * Builds its list (in the light DOM — newskit.css owns the look, and a
- * fully hand-written <nav class="sac-toc"> renders identically) from the
- * document's chapter anchors after DOMContentLoaded:
+ * fully hand-written <nav class="sac-toc"> renders identically, its list
+ * always open) from the document's chapter anchors after DOMContentLoaded:
  *
  * - Targets default to every <sac-section-head> / .sac-section-head.
  * - A target without an id gets one, slugged from its title.
  * - Link text = the target's <h2> (or its own text).
+ * - The element becomes a navigation landmark named after its label.
  *
  * Position tracking (same maths as the approved design template): active =
  * the last chapter whose top has crossed the 28% reading line; at the page
  * bottom the final chapter is forced active so the last item lights up.
- * Clicks scroll smoothly (honouring prefers-reduced-motion) and update the
- * URL fragment without adding history entries.
+ * A click scrolls smoothly (honouring prefers-reduced-motion), moves focus
+ * to the chapter's heading so the next Tab continues inside that chapter,
+ * and adds a history entry, so Back returns to where the reader was.
  *
  * Attributes:
  *   brand — display-face brand line above the rail (optional).
@@ -33,6 +37,8 @@
 
     const t = (key, fallback) =>
         (window.sac && window.sac.t) ? window.sac.t(key, fallback) : fallback;
+
+    let uid = 0;
 
 class SacToc extends HTMLElement {
     connectedCallback() {
@@ -70,25 +76,44 @@ class SacToc extends HTMLElement {
         const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
         const brand = this.getAttribute("brand");
         const label = this.getAttribute("label") || t("newskit.toc.contents", "Contents");
+        const listId = this._listId || (this._listId = `sac-toc-list-${++uid}`);
+        // Compact layouts start collapsed; a rebuild keeps the reader's choice.
+        const open = this.querySelector(".toc-toggle")?.getAttribute("aria-expanded") === "true";
+
+        this.setAttribute("role", "navigation");
+        this.setAttribute("aria-label", label);
         this.innerHTML =
             (brand ? `<p class="brand">${esc(brand)}</p>` : "") +
-            `<p class="rail-label">${esc(label)}</p>` +
-            `<ol>` + this._targets.map((el, i) => {
+            `<p class="rail-label" aria-hidden="true">${esc(label)}</p>` +
+            `<button type="button" class="btn toc-toggle" aria-expanded="${open}" aria-controls="${listId}">${esc(label)}</button>` +
+            `<ol id="${listId}">` + this._targets.map((el, i) => {
                 const title = (el.querySelector("h2, h3")?.textContent || el.textContent).trim();
                 return `<li><a href="#${esc(el.id)}">` +
                        `<span class="n">${String(i + 1).padStart(2, "0")}</span> ${esc(title)}</a></li>`;
             }).join("") + `</ol>`;
         this._links = [...this.querySelectorAll("ol a")];
 
+        const toggle = this.querySelector(".toc-toggle");
+        toggle.addEventListener("click", () => {
+            toggle.setAttribute("aria-expanded", String(toggle.getAttribute("aria-expanded") !== "true"));
+        });
+
         // Explicit smooth scroll — reliable for every link including the
         // last one, which a native anchor jump can't reach when the page
-        // bottom is closer than the scroll line.
+        // bottom is closer than the scroll line. Then the reader follows
+        // the view: focus lands on the chapter heading, and the jump gets
+        // its own history entry.
         const reduce = matchMedia("(prefers-reduced-motion: reduce)");
         this._links.forEach((a, i) => a.addEventListener("click", (e) => {
             e.preventDefault();
-            const top = this._targets[i].getBoundingClientRect().top + window.scrollY - 16;
+            const target = this._targets[i];
+            const top = target.getBoundingClientRect().top + window.scrollY - 16;
+            const hash = a.getAttribute("href");
+            if (location.hash !== hash) history.pushState(null, "", hash);
             window.scrollTo({ top, behavior: reduce.matches ? "auto" : "smooth" });
-            history.replaceState(null, "", a.getAttribute("href"));
+            const heading = target.querySelector("h2, h3") || target;
+            if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
+            heading.focus({ preventScroll: true });
         }));
 
         this._onScroll = () => {
@@ -103,6 +128,8 @@ class SacToc extends HTMLElement {
             this._links.forEach((a, i) => {
                 a.classList.toggle("active", i === idx);
                 a.classList.toggle("done", i < idx);
+                if (i === idx) a.setAttribute("aria-current", "location");
+                else a.removeAttribute("aria-current");
             });
         };
         window.addEventListener("scroll", this._onScroll, { passive: true });
