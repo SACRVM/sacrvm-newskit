@@ -9,7 +9,7 @@ publication hub, and — the point — **sources and provenance as first-class c
 because that is what a researched article stands on.
 
 - **Zero dependencies, no build.** Pure vanilla Custom Elements + plain CSS, served as-is
-  (`npx serve .`).
+  (`python3 -m http.server`).
 - **Built on appkit.** Vendors the appkit `kit/` and consumes its tokens; a retheme of
   appkit rethemes newskit.
 - **Hand-authored articles.** An article is an HTML file using the `sac-*` primitives — no
@@ -24,8 +24,8 @@ decisions and the Fable + Grok design review) is the project-plan artifact linke
 
 ## Development
 
-```
-npx serve .    # http://localhost:3000
+```bash
+python3 -m http.server 3001    # http://localhost:3001
 ```
 
 No build step. No tests — verify manually in the browser.

@@ -1,6 +1,6 @@
 # CLAUDE.md — SACRVM NEWSKIT
 
-Newskit is the **editorial sister of SACRVM APPKIT** (`D:\repos\sacrvm-appkit`): a
+Newskit is the **editorial sister of SACRVM APPKIT** (`../sacrvm-appkit`, a sibling checkout): a
 zero-dependency kit for publishing long-form, source-backed articles. It wears appkit's
 own look and specialises it for *reading* — a condensed news-headline treatment, article
 primitives, a publication hub, and (the point) **sources and provenance as first-class
@@ -28,7 +28,7 @@ vendored `kit/` on the appkit version newskit targets; re-vendor on each appkit 
 ## Core philosophy (inherited from appkit — non-negotiable)
 
 1. **Zero dependencies, no build step.** Pure vanilla Custom Elements + plain CSS, served
-   as-is (`npx serve .`). Never a bundler, never node_modules in the dev loop.
+   as-is (`python3 -m http.server`). Never a bundler, never node_modules in the dev loop.
 2. **Drop-in usable.** A publication consumes newskit by vendoring the `newskit/` folder
    (plus appkit's `kit/`) and writing plain HTML.
 3. **Hand-authored articles.** An article is an HTML file using the `sac-*` primitives —
@@ -86,7 +86,7 @@ extensions (feed, tags/series). Smallest first; each phase usable on its own. Se
 ## Development
 
 ```bash
-npx serve .    # http://localhost:3000 — same workflow as appkit
+python3 -m http.server 3001    # http://localhost:3001 — the Firepit command "Run site"
 ```
 
 No build step. No tests — verify manually in the browser, in both the style guide and the demo.

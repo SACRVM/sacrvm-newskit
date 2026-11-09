@@ -6,7 +6,7 @@ artifact: https://claude.ai/code/artifact/44c9a845-c11a-40a9-ae5c-2fe7cc6495dc
 The **approved visual design template** — that same page rendered in the target style
 (appkit look + Oswald headlines, the chapter rail, the credibility spine) — is checked in
 at [`reference/design-template.html`](reference/design-template.html). Open it directly, or
-`npx serve .` → `/reference/design-template.html`. Phase 1 extracts `newskit.css` from it;
+serve the repo (`python3 -m http.server 3001`) → `/reference/design-template.html`. Phase 1 extracts `newskit.css` from it;
 it is the source of truth for the look, signed off by the owner.
 
 ## Locked decisions
